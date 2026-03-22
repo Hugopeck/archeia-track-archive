@@ -3,6 +3,7 @@
 <!-- DECISION INDEX (agents: scan this first, load full entries as needed)
 | Date       | Domain       | Title                                                          | Status     |
 |------------|--------------|----------------------------------------------------------------|------------|
+| 2026-03-22 | Distribution | D-034: Plugin conversion (dual-format)                         | Accepted   |
 | 2026-03-21 | Product      | D-027: Kill the scanner as V0 product                          | Accepted   |
 | 2026-03-21 | Product      | D-028: Kill the cloud service                                  | Accepted   |
 | 2026-03-21 | Product      | D-029: Skill-only V0 (two SKILL.md + templates)                | Accepted   |
@@ -39,6 +40,32 @@
 -->
 
 ---
+
+
+## 2026-03-22 — D-034: Plugin conversion (dual-format)
+
+**Domain:** Distribution
+**Status:** Accepted
+
+**Context:** Archeia currently ships as standalone skill files that users copy into `.claude/skills/`. Claude Code plugin packaging adds one-command install, marketplace discovery, and versioned distribution, but the product still needs to work as plain skills in repositories that prefer direct file copies. Hooks were evaluated already and are not required for V0 because native `AGENTS.md` and `CLAUDE.md` loading plus CI-time checks cover the important behavior.
+
+**Decision:** Add a plugin distribution alongside the existing standalone files. Create `archeia-plugin/` with plugin metadata, rename the packaged skills to `/archeia:init` and `/archeia:ask`, copy the init templates into the plugin skill, and leave `hooks/hooks.json` empty. Keep `.claude/skills/archeia/` and `.claude/skills/archeia-ask/` unchanged as the standalone format.
+
+**Assumptions relied on:** A-001 (agent-native users), A-009 (agents follow instruction files), A-011 (templates plus instructions beat scanner pipeline for V0)
+**Constraints respected:** Distribution (plugin + standalone), Design (no lifecycle hooks), Product shape (skill-first)
+
+**Consequences:**
+- Archeia can be installed either as a Claude Code plugin or as copied standalone skills.
+- Marketplace submission and plugin-based discovery are now unblocked.
+- The plugin format stays minimal because native doc loading handles the key behavior without custom hooks.
+- Existing standalone users do not need to migrate or rename their current commands.
+
+**Alternatives considered:**
+- Plugin-only distribution — rejected because standalone skill copying is still useful and already works.
+- Adding lifecycle hooks now — rejected because native doc loading and CI-time checks are sufficient for V0.
+- Leaving distribution as standalone files only — rejected because it blocks plugin install flows and marketplace discovery.
+
+**Cascades to:** TODO.md, docs/designs/plugin-extensibility.md, plugin packaging, marketplace submission
 
 
 ## 2026-03-21 — D-027: Kill the scanner as V0 product

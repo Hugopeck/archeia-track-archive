@@ -2,20 +2,6 @@
 
 ## Next Up
 
-### [ ] Plugin conversion (dual-format)
-
-Convert Archeia to a Claude Code plugin while maintaining standalone skill files.
-
-- Create plugin directory with `.claude-plugin/plugin.json` (name: `archeia`)
-- Create `skills/init/SKILL.md` (renamed from archeia, produces `/archeia:init`)
-- Create `skills/ask/SKILL.md` (renamed from archeia-ask, produces `/archeia:ask`)
-- Copy `templates/` into `skills/init/templates/`
-- Add empty `hooks/hooks.json` (ready for future use)
-- Verify with `claude --plugin-dir ./archeia-plugin`
-- Keep standalone `.claude/skills/archeia/` and `.claude/skills/archeia-ask/` alongside
-
-Design doc: `docs/designs/plugin-extensibility.md`
-
 ### [ ] Marketplace submission
 
 Submit the Archeia plugin to the official Anthropic marketplace (`claude-plugins-official`). Requires: plugin name, description, version, homepage, public GitHub repo. Submit via claude.ai/settings/plugins/submit or platform.claude.com/plugins/submit.
@@ -77,6 +63,20 @@ Self-contained HTML with system topology, module cards, evolution timeline. Open
 Decide which internal reports remain canonical. Define comparison workflows between agent-authored outputs and internal baselines. Keep the internal lane as leverage for the product lane, not as a separate product.
 
 ## Completed
+
+### [x] Plugin conversion (dual-format)
+
+Convert Archeia to a Claude Code plugin while maintaining standalone skill files.
+
+- Create plugin directory with `.claude-plugin/plugin.json` (name: `archeia`)
+- Create `skills/init/SKILL.md` (renamed from archeia, produces `/archeia:init`)
+- Create `skills/ask/SKILL.md` (renamed from archeia-ask, produces `/archeia:ask`)
+- Copy `templates/` into `skills/init/templates/`
+- Add empty `hooks/hooks.json` (ready for future use)
+- Verify with `claude --plugin-dir ./archeia-plugin`
+- Keep standalone `.claude/skills/archeia/` and `.claude/skills/archeia-ask/` alongside
+
+Design doc: `docs/designs/plugin-extensibility.md`
 
 Historical work that informed the current direction (P0-P2):
 - Pivot alignment and repo realignment

@@ -1,0 +1,7 @@
+{
+  "name": "archeia",
+  "description": "Generate and maintain architecture guidance for a repository. Produces .archeia/ docs, AGENTS.md, and CLAUDE.md from real repo evidence.",
+  "author": {
+    "name": "Hugo Peck"
+  }
+}
