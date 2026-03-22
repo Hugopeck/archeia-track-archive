@@ -12,19 +12,27 @@ Archeia generates and maintains architecture guidance that AI agents actually re
 - `AGENTS.md` — behavioral contract for agent work
 - `CLAUDE.md` — Claude-specific workflow guide
 
-The docs stay current through commit-time checks and PR-based review.
+The docs stay current through normal git workflows, release automation, and PR-based review.
 
 ## Install
 
-### As a plugin
+### Claude Code plugin
+
+Run Archeia locally as a plugin during development and testing:
 
 ```shell
-/plugin install archeia@marketplace
+claude --plugin-dir ./archeia-plugin
 ```
 
-### As standalone skills
+Marketplace submission is planned later, after more testing.
+
+### Claude Code skills
 
 Copy `.claude/skills/archeia/` and `.claude/skills/archeia-ask/` into your project's `.claude/skills/` directory.
+
+### Agent Skills format
+
+Copy `skills/archeia-init/` and `skills/archeia-ask/` into a compatible agent-skills directory for Codex CLI, Cursor, or other tools that use the Agent Skills spec.
 
 ## Usage
 
@@ -36,6 +44,12 @@ Copy `.claude/skills/archeia/` and `.claude/skills/archeia-ask/` into your proje
 
 Explores the repo, generates the knowledge base from templates, and writes `AGENTS.md` + `CLAUDE.md`.
 
+Plugin command:
+
+```
+/archeia:init
+```
+
 ### Ask questions
 
 ```
@@ -43,6 +57,12 @@ Explores the repo, generates the knowledge base from templates, and writes `AGEN
 ```
 
 Loads the knowledge base and answers architecture questions with evidence paths.
+
+Plugin command:
+
+```
+/archeia:ask how does the auth system work?
+```
 
 ## How it works
 

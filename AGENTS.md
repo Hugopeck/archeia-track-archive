@@ -11,9 +11,10 @@ The product is two skills plus templates — no CLI, no binary, no cloud service
 ```
 .claude/skills/archeia/       <- /archeia skill (generate + maintain docs)
 .claude/skills/archeia-ask/   <- /archeia-ask skill (query the knowledge base)
+archeia-plugin/               <- Claude Code plugin distribution
+skills/                       <- Agent Skills distribution for Codex/Cursor/etc.
 .archeia/                     <- Archeia's own knowledge base (product docs)
 docs/designs/                 <- Strategic design documents
-docs/templates/               <- Example output templates
 ```
 
 ## Key Boundaries
@@ -27,13 +28,14 @@ docs/templates/               <- Example output templates
 
 When modifying skills:
 1. Edit the SKILL.md files directly
-2. Test by running `/archeia` or `/archeia-ask` in a sample repo
+2. Test in a sample repo via `/archeia` or `/archeia-ask`, or via the plugin as `/archeia:init` or `/archeia:ask`
 3. Update `.archeia/` docs if product direction changes
 
 When modifying templates:
 1. Templates are in `.claude/skills/archeia/templates/`
 2. Changes affect what `/archeia` generates in customer repos
 3. Keep templates minimal — provide structure and hints, not rigid prose
+4. Update all copies: `.claude/skills/archeia/templates/`, `archeia-plugin/skills/init/templates/`, and `skills/archeia-init/templates/`
 
 ## What Not to Do
 
