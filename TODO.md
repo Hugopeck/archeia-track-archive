@@ -14,10 +14,6 @@ Open a PR to gstack adding Archeia-awareness to `/plan-eng-review` and `/review`
 
 ## Skills
 
-### [ ] LLM-guided Layer 3 init
-
-Build the `/archeia:init` skill's bottom-up init flow. The skill navigates the repo via LLM, reads directory structure, manifests, configs, imports, and generates ARCHITECTURE.md, STANDARDS.md, GUIDE.md directly in `.archeia/`. No human input needed for Layer 3.
-
 ### [ ] Git history analysis step
 
 Add git history analysis between Layer 3 and Layer 2. The skill reads git log, identifies major dependency shifts, structural changes, architectural inflection points, contributor patterns, module churn. Feeds into Layer 2 questions.
@@ -52,6 +48,10 @@ Action recipe for scheduled or on-PR drift detection. Runs `archeia check` and c
 
 Pull request template that asks reviewers to confirm doc changes when architecture shifts.
 
+### [ ] Reproducibility measurement
+
+Measure template determinism by running `/archeia:init` on the same repo 3 times and diffing outputs. Track which sections vary (likely Data Flow, Change Notes) vs which are stable (Prerequisites, Project Structure). Use findings to tighten templates where variance is high.
+
 ## Low Priority
 
 ### [ ] report.html interactive deliverable
@@ -63,6 +63,12 @@ Self-contained HTML with system topology, module cards, evolution timeline. Open
 Decide which internal reports remain canonical. Define comparison workflows between agent-authored outputs and internal baselines. Keep the internal lane as leverage for the product lane, not as a separate product.
 
 ## Completed
+
+### [x] LLM-guided Layer 3 init
+
+Build the `/archeia:init` skill's bottom-up init flow. The skill navigates the repo via LLM, reads directory structure, manifests, configs, imports, and generates ARCHITECTURE.md, STANDARDS.md, GUIDE.md directly in `.archeia/`. No human input needed for Layer 3.
+
+**Completed:** v1.1.0 (2026-03-22) — Phase 1 shipped: rewritten SKILL.md with exploration algorithm, inference signal table, self-validation; rewritten ARCHITECTURE.md, STANDARDS.md, GUIDE.md templates with frontmatter, quality rubrics, anti-patterns; sync script for 3-way template distribution.
 
 ### [x] Plugin conversion (dual-format)
 
