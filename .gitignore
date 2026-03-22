@@ -1,0 +1,13 @@
+# OS
+.DS_Store
+
+# Editor
+*.swp
+*.swo
+*~
+
+# gstack
+.gstack/
+
+# Conductor
+.context/
