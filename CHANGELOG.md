@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/Hugopeck/archeia/compare/v1.0.0...v1.1.0) (2026-03-22)
+
+
+### Features
+
+* **skills:** rewrite Layer 3 templates for deterministic init ([#3](https://github.com/Hugopeck/archeia/issues/3)) ([7dbbf44](https://github.com/Hugopeck/archeia/commit/7dbbf4470b526c3ed2a85e6e8b299cebbe41a711))
+
 # 1.0.0 (2026-03-22)
 
 
