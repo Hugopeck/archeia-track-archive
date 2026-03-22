@@ -6,7 +6,7 @@
 
 Submit the Archeia plugin to the official Anthropic marketplace (`claude-plugins-official`). Requires: plugin name, description, version, homepage, public GitHub repo. Submit via claude.ai/settings/plugins/submit or platform.claude.com/plugins/submit.
 
-Depends on: plugin conversion.
+Deferred pending more real-world testing of the local plugin and standalone skill distributions.
 
 ### [ ] gstack integration PR
 
@@ -72,7 +72,6 @@ Convert Archeia to a Claude Code plugin while maintaining standalone skill files
 - Create `skills/init/SKILL.md` (renamed from archeia, produces `/archeia:init`)
 - Create `skills/ask/SKILL.md` (renamed from archeia-ask, produces `/archeia:ask`)
 - Copy `templates/` into `skills/init/templates/`
-- Add empty `hooks/hooks.json` (ready for future use)
 - Verify with `claude --plugin-dir ./archeia-plugin`
 - Keep standalone `.claude/skills/archeia/` and `.claude/skills/archeia-ask/` alongside
 
