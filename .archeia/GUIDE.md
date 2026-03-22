@@ -2,18 +2,28 @@
 
 ## Setup
 
-Install the skills by placing these directories in your agent's skill path:
+Three install options:
 
+**Claude Code plugin** (recommended for local dev):
+```shell
+claude --plugin-dir ./archeia-plugin
+```
+
+**Claude Code skills** (copy into any project):
 ```text
 .claude/skills/archeia/
 .claude/skills/archeia-ask/
 ```
 
-For Claude-style environments, keeping them under `.claude/skills/` is the default shape.
+**Agent Skills** (for Codex CLI, Cursor, etc.):
+```text
+skills/archeia-init/
+skills/archeia-ask/
+```
 
-## Using `/archeia`
+## Using `/archeia` (or `/archeia:init`)
 
-Use `/archeia` when you want to:
+Use `/archeia` (or `/archeia:init` via the plugin) when you want to:
 - initialize architecture docs for a repo
 - refresh stale docs after meaningful code changes
 - migrate existing architecture notes into the Archeia structure
@@ -25,9 +35,9 @@ Recommended workflow:
 3. confirm `AGENTS.md` and `CLAUDE.md`
 4. choose whether maintenance should stay inline or move into a PR / GitHub Action flow
 
-## Using `/archeia-ask`
+## Using `/archeia-ask` (or `/archeia:ask`)
 
-Use `/archeia-ask` when you want architecture answers from the existing knowledge base without regenerating it.
+Use `/archeia-ask` (or `/archeia:ask` via the plugin) when you want architecture answers from the existing knowledge base without regenerating it.
 
 Good uses:
 - onboarding questions
@@ -43,7 +53,7 @@ Good uses:
 
 ## Working With Templates
 
-Templates live under `.claude/skills/archeia/templates/`.
+Templates live under `.claude/skills/archeia/templates/` (canonical copy).
 
 Use them to:
 - create a consistent first draft
@@ -52,14 +62,7 @@ Use them to:
 
 Do not over-template the writing. The template should guide the document, not replace repo-specific thinking.
 
-## Legacy Code
-
-This repository still contains historical package code under `packages/`.
-
-If you are working in that code:
-- use the existing `pnpm` workflow
-- keep tests and docs aligned with any behavior changes
-- treat the code as historical implementation, not the current product definition
+After editing templates, run `bash scripts/sync-templates.sh` to propagate changes to the plugin and agent-skills distributions.
 
 ## Shipping Changes
 
