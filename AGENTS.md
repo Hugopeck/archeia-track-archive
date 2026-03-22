@@ -13,6 +13,7 @@ The product is two skills plus templates — no CLI, no binary, no cloud service
 .claude/skills/archeia-ask/   <- /archeia-ask skill (query the knowledge base)
 archeia-plugin/               <- Claude Code plugin distribution
 skills/                       <- Agent Skills distribution for Codex/Cursor/etc.
+scripts/                      <- Maintenance scripts (template sync, etc.)
 .archeia/                     <- Archeia's own knowledge base (product docs)
 docs/designs/                 <- Strategic design documents
 ```

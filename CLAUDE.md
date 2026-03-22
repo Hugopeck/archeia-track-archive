@@ -38,5 +38,5 @@ This is the Archeia repository — an architecture knowledge framework delivered
 
 - Archeia was extracted from a larger TypeScript monorepo — the historical packages are gone
 - Lifecycle hooks were evaluated and rejected — native doc loading + CI checks are sufficient
-- Templates are duplicated in `.claude/skills/archeia/templates/`, `archeia-plugin/skills/init/templates/`, and `skills/archeia-init/templates/` — update all three when editing
+- Templates are duplicated in `.claude/skills/archeia/templates/`, `archeia-plugin/skills/init/templates/`, and `skills/archeia-init/templates/` — edit the canonical copy in `.claude/skills/archeia/` then run `bash scripts/sync-templates.sh` before committing
 - Read `.archeia/VISION.md` and `.archeia/PRODUCT.md` for full product context

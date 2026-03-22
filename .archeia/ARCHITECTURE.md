@@ -60,18 +60,17 @@ The skills primarily write:
 - PR confirmation over custom approval UI
 - maintenance workflow over one-time scan output
 
-## Existing Code (Historical)
+## Distribution Channels
 
-The `packages/` monorepo remains in this repository. It contains scanner, renderer, CLI, analyzer, and experiment code that informed the direction shift.
+Archeia ships in three formats from a single source of truth:
 
-That code is historical and educational for V0. It is not the product definition.
+- **Claude Code skills** — `.claude/skills/archeia/` and `.claude/skills/archeia-ask/` (copy into any project)
+- **Claude Code plugin** — `archeia-plugin/` (install with `claude --plugin-dir`)
+- **Agent Skills** — `skills/archeia-init/` and `skills/archeia-ask/` (for Codex CLI, Cursor, etc.)
+
+Templates are canonical in `.claude/skills/archeia/templates/` and synced to the other distributions via `scripts/sync-templates.sh`.
 
 ## Repo Tooling
 
-The repo still uses existing tooling for itself:
-- `pnpm` for workspace management
-- TypeScript for the historical package code
-- vitest and repository automation for legacy validation
-- semantic-release and GitHub workflows for repo maintenance
-
-Those tools support the repository. They are not Archeia V0's user-facing architecture.
+- semantic-release and GitHub Actions for versioning and releases
+- No build step, no runtime dependencies — the product is markdown files
