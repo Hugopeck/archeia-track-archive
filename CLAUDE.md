@@ -2,25 +2,37 @@
 
 ## Project Context
 
-This is the Archeia repository — an architecture knowledge framework delivered as Claude Code skills. The entire product surface is markdown files: two skills and their templates.
+This is the Archeia monorepo. It ships two local-first products:
+
+- **Archeia** — architecture knowledge generation and query skills
+- **Track** — file-based multi-agent coordination skills
+
+Most product logic lives in markdown skill files, Archeia templates, and Track protocol docs. The only deterministic code path is Track's Python validator.
 
 ## Key Files
 
-- `.claude/skills/archeia/SKILL.md` — the main skill that generates architecture docs
-- `.claude/skills/archeia-ask/SKILL.md` — the query skill
-- `.claude/skills/archeia/templates/` — 10 template files that shape generated output
-- `archeia-plugin/` — Claude Code plugin distribution with `/archeia:init` and `/archeia:ask`
-- `skills/` — agent-skills distribution for Codex CLI, Cursor, and compatible tools
+- `.claude/skills/archeia/SKILL.md` — Archeia write-path skill
+- `.claude/skills/archeia-ask/SKILL.md` — Archeia query skill
+- `.claude/skills/track-*/SKILL.md` — Track coordination skills
+- `.claude/skills/archeia/templates/` — Archeia's canonical template set
+- `plugins/archeia/` — Claude Code plugin distribution for `/archeia:init` and `/archeia:ask`
+- `plugins/track/` — Claude Code plugin distribution for `/track:*`
+- `skills/` — skills.sh / Codex / Cursor distributions
+- `.track/PROTOCOL.md` — source of truth for Track's task format and coordination rules
+- `tools/track-lint.py` — deterministic Track validator used in CI
+- `scripts/sync-skills.sh` — syncs canonical skills to both distribution targets
 - `.releaserc.json` — semantic-release configuration for versioning and GitHub releases
+- `.github/workflows/ci.yml` — sync check + Track validation
 - `.github/workflows/release.yml` — release automation on pushes to `main`
 - `.archeia/` — Archeia's own product documentation (self-referential)
 - `TODO.md` — current development priorities
 
 ## Workflow
 
-- This repo has no build step and no runtime test suite
+- This repo has no app build step and no service runtime
 - GitHub Actions runs semantic-release on pushes to `main`
-- Changes are documentation and skill markdown changes
+- CI checks skill sync plus Track validation and tests
+- Most changes are documentation and skill markdown changes
 - Use conventional commits so release automation can infer versions
 - Keep PRs focused — one concern per PR
 
@@ -28,15 +40,18 @@ This is the Archeia repository — an architecture knowledge framework delivered
 
 | Prefix | Bump | When to use |
 |--------|------|-------------|
-| `feat(skills):` | Minor | New skill capability or new template |
-| `fix(skills):` | Patch | Fix in skill logic or template content |
-| `feat(framework):` | Minor | New `.archeia/` document type or framework capability |
+| `feat(archeia):` | Minor | New Archeia capability or template change |
+| `feat(track):` | Minor | New Track skill or protocol capability |
+| `fix(skills):` | Patch | Fix in skill logic, sync logic, or distribution content |
+| `fix(track):` | Patch | Fix in Track protocol or validator behavior |
 | `docs:` | None | Routine documentation edits that should not release |
-| `feat!:` / `fix!:` | Major | Breaking change to a skill interface or template structure |
+| `feat!:` / `fix!:` | Major | Breaking change to a public skill interface or protocol |
 
 ## Important Context
 
 - Archeia was extracted from a larger TypeScript monorepo — the historical packages are gone
+- Track is now co-located here as a sibling product with its own protocol and validator
 - Lifecycle hooks were evaluated and rejected — native doc loading + CI checks are sufficient
-- Templates are duplicated in `.claude/skills/archeia/templates/`, `archeia-plugin/skills/init/templates/`, and `skills/archeia-init/templates/` — edit the canonical copy in `.claude/skills/archeia/` then run `bash scripts/sync-templates.sh` before committing
+- Edit canonical skills in `.claude/skills/` first, then run `bash scripts/sync-skills.sh`
+- Track changes that touch protocol or lint rules should also run `python3 tools/track-lint.py` and `python3 tools/tests/test_track_lint.py`
 - Read `.archeia/VISION.md` and `.archeia/PRODUCT.md` for full product context

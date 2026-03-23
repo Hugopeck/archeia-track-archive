@@ -1,0 +1,35 @@
+schema_version: '0.1'
+statuses:
+- triage
+- todo
+- active
+- review
+- done
+- cancelled
+priorities:
+- urgent
+- high
+- medium
+- low
+types:
+- bug
+- feature
+- improvement
+- debt
+- infra
+- spike
+scopes: []
+projects:
+  conductor-workspace:
+    title: Conductor Workspace Scripts
+    description: Add repo-shared Conductor scripts only after the ephemeral-derived migration and docs land cleanly.
+  ephemeral-derived:
+    title: Ephemeral Derived Files + Doc Alignment
+    description: Make index.json and BOARD.md gitignored ephemeral files and align all docs with current codebase state.
+  launch-readiness:
+    title: Pure Skill Pack Launch
+    description: Ship Track as a pure skill pack — no compiled binary. Skills, PROTOCOL.md, and tools/track-lint.py replace the Rust CLI.
+  task-model-v2:
+    title: Task Model V2
+    description: Migrate Track from boolean readiness to explicit mode plus triage/todo ready-gate semantics.
+id_counter: 43

@@ -49,7 +49,7 @@
 
 **Context:** Archeia currently ships as standalone skill files that users copy into `.claude/skills/`. Claude Code plugin packaging adds one-command install, marketplace discovery, and versioned distribution, but the product still needs to work as plain skills in repositories that prefer direct file copies. Hooks were evaluated already and are not required for V0 because native `AGENTS.md` and `CLAUDE.md` loading plus CI-time checks cover the important behavior.
 
-**Decision:** Add a plugin distribution alongside the existing standalone files. Create `archeia-plugin/` with plugin metadata, rename the packaged skills to `/archeia:init` and `/archeia:ask`, copy the init templates into the plugin skill, and leave `hooks/hooks.json` empty. Keep `.claude/skills/archeia/` and `.claude/skills/archeia-ask/` unchanged as the standalone format.
+**Decision:** Add a plugin distribution alongside the existing standalone files. Create `plugins/archeia/` with plugin metadata, rename the packaged skills to `/archeia:init` and `/archeia:ask`, copy the init templates into the plugin skill, and keep `.claude/skills/archeia/` and `.claude/skills/archeia-ask/` unchanged as the standalone format.
 
 **Assumptions relied on:** A-001 (agent-native users), A-009 (agents follow instruction files), A-011 (templates plus instructions beat scanner pipeline for V0)
 **Constraints respected:** Distribution (plugin + standalone), Design (no lifecycle hooks), Product shape (skill-first)

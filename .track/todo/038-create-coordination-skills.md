@@ -1,0 +1,49 @@
+---
+id: "038"
+title: "[Implement] Create coordination skills: claim, release, available, validate, init"
+status: todo
+mode: implement
+priority: high
+type: feature
+project: launch-readiness
+created: 2026-03-22
+updated: 2026-03-22
+depends_on:
+  - "036"
+files:
+  - ".claude/skills/track-claim/**"
+  - ".claude/skills/track-release/**"
+  - ".claude/skills/track-available/**"
+  - ".claude/skills/track-validate/**"
+  - ".claude/skills/track-init/**"
+---
+
+## Context
+
+### Problem
+The pure skill pack needs coordination skills for multi-agent work: claiming tasks, releasing claims, finding available work, validating consistency, and bootstrapping new repos.
+
+### Affected Files
+- .claude/skills/track-claim/SKILL.md
+- .claude/skills/track-release/SKILL.md
+- .claude/skills/track-available/SKILL.md
+- .claude/skills/track-validate/SKILL.md
+- .claude/skills/track-init/SKILL.md
+
+## Acceptance Criteria
+
+- [ ] track-claim creates claim files with TTL
+- [ ] track-release removes claim files
+- [ ] track-available filters by deps, claims, and file scope overlap
+- [ ] track-validate checks all validation rules from PROTOCOL.md
+- [ ] track-init bootstraps .track/ directory
+- [ ] Each skill has agents/openai.yaml
+
+## Verification
+
+- All 5 skill directories exist with SKILL.md and agents/openai.yaml
+- python3 track-lint.py passes
+
+## Notes
+
+- 2026-03-22 agent: Part of pure skill pack pivot.

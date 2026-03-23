@@ -2,45 +2,60 @@
 
 ## Repository Overview
 
-Archeia is an architecture knowledge framework delivered as Claude Code skills. It generates and maintains `.archeia/` documentation, `AGENTS.md`, and `CLAUDE.md` for any repository.
+This repo is the Archeia monorepo. It contains two markdown-first products:
 
-The product is two skills plus templates — no CLI, no binary, no cloud service.
+- **Archeia** — architecture knowledge generation and query skills
+- **Track** — file-based multi-agent task coordination skills
+
+The product surface is local skill packs, templates, protocol docs, and a small amount of maintenance tooling. There is no app server, no SaaS backend, and no compiled product runtime.
 
 ## Repository Structure
 
 ```
-.claude/skills/archeia/       <- /archeia skill (generate + maintain docs)
-.claude/skills/archeia-ask/   <- /archeia-ask skill (query the knowledge base)
-archeia-plugin/               <- Claude Code plugin distribution
-skills/                       <- Agent Skills distribution for Codex/Cursor/etc.
-scripts/                      <- Maintenance scripts (template sync, etc.)
-.archeia/                     <- Archeia's own knowledge base (product docs)
+.claude/skills/               <- Canonical source for all skills
+  archeia/                    <- /archeia write path + templates
+  archeia-ask/                <- /archeia-ask read path
+  track-*/                    <- Track coordination skills
+plugins/                      <- Claude Code plugin distributions
+  archeia/                    <- /archeia:init and /archeia:ask
+  track/                      <- /track:* commands
+skills/                       <- skills.sh / Codex / Cursor distributions
+scripts/                      <- Maintenance scripts (skill sync, commit checks)
+tools/                        <- Deterministic validation tooling
+.track/                       <- Track protocol + dogfooding workspace
+.archeia/                     <- Archeia's own product docs
 docs/designs/                 <- Strategic design documents
 ```
 
 ## Key Boundaries
 
-- **Skills are markdown** — all product logic lives in SKILL.md files and templates
-- **No runtime dependencies** — no package.json, no build step, no compiled output
-- **Templates drive consistency** — `.claude/skills/archeia/templates/` contains the 10 template files that shape output
-- **`.archeia/` is self-referential** — this repo uses Archeia on itself
+- **Canonical source is `.claude/skills/`** — edit canonical skills first, then sync distributions
+- **Skills are markdown-first** — product behavior lives in `SKILL.md`, templates, and `.track/PROTOCOL.md`
+- **Track protocol is strict** — do not silently widen schema, status vocabulary, or claim rules
+- **Maintenance tooling is local** — `scripts/sync-skills.sh` and `tools/track-lint.py` keep distributions and `.track/` honest
+- **`.archeia/` is self-referential** — it documents this repo's own product architecture
 
 ## Working in This Repo
 
-When modifying skills:
-1. Edit the SKILL.md files directly
-2. Test in a sample repo via `/archeia` or `/archeia-ask`, or via the plugin as `/archeia:init` or `/archeia:ask`
-3. Update `.archeia/` docs if product direction changes
+When modifying Archeia:
+1. Edit `.claude/skills/archeia/` or `.claude/skills/archeia-ask/` directly
+2. Keep templates minimal — structure and hints, not rigid prose
+3. Run `bash scripts/sync-skills.sh` after changing canonical skill files or templates
+4. Update `.archeia/` docs when Archeia's product direction, layout, or maintenance flow changes
 
-When modifying templates:
-1. Templates are in `.claude/skills/archeia/templates/`
-2. Changes affect what `/archeia` generates in customer repos
-3. Keep templates minimal — provide structure and hints, not rigid prose
-4. Update all copies: `.claude/skills/archeia/templates/`, `archeia-plugin/skills/init/templates/`, and `skills/archeia-init/templates/`
+When modifying Track:
+1. Read `.track/PROTOCOL.md` before changing task schema, validation rules, or skill behavior
+2. Edit `.claude/skills/track-*/` directly
+3. Keep `tools/track-lint.py`, `.track/PROTOCOL.md`, and Track skill behavior aligned in the same change
+4. Run `python3 tools/track-lint.py` and `python3 tools/tests/test_track_lint.py` when Track rules or tooling change
+
+When modifying distributions:
+1. Do not hand-edit generated copies in `plugins/*/skills/` or `skills/*/` unless you are fixing the sync process itself
+2. Run `bash scripts/sync-skills.sh --check` before landing distribution-related changes
 
 ## What Not to Do
 
-- Do not add runtime dependencies or build tooling
-- Do not create a CLI entrypoint
-- Do not add lifecycle hooks (evaluated and rejected — see `.archeia/DECISIONS.md`)
-- Do not modify `.archeia/` docs without understanding they describe the product itself
+- Do not add a CLI, daemon, or cloud service
+- Do not edit generated skill copies instead of the canonical source
+- Do not silently widen Track's schema, statuses, priorities, types, or modes
+- Do not modify `.archeia/` docs casually — they describe the repo's actual product architecture

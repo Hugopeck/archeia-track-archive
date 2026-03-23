@@ -1,0 +1,46 @@
+---
+id: "041"
+title: "[Implement] Rewrite AGENTS.md, conductor.json, and CI for pure skill pack"
+status: todo
+mode: implement
+priority: high
+type: feature
+project: launch-readiness
+created: 2026-03-22
+updated: 2026-03-22
+depends_on:
+  - "037"
+  - "038"
+  - "040"
+files:
+  - "AGENTS.md"
+  - "conductor.json"
+  - ".github/workflows/**"
+---
+
+## Context
+
+### Problem
+AGENTS.md, conductor.json, and CI workflows all reference the Rust binary (cargo run, cargo test, etc.) which no longer exists. They must be rewritten to describe the skill-based workflow and reference track-lint.py.
+
+### Affected Files
+- AGENTS.md
+- conductor.json
+- .github/workflows/ci.yml
+- .github/workflows/track-ci.yml
+
+## Acceptance Criteria
+
+- [ ] AGENTS.md describes skill-based workflow, references PROTOCOL.md
+- [ ] conductor.json runs track-lint.py instead of cargo commands
+- [ ] CI runs track-lint.py and lint tests
+- [ ] No references to cargo, Rust, or the compiled binary
+
+## Verification
+
+- grep -r "cargo" AGENTS.md conductor.json .github/workflows/ returns no matches
+- python3 track-lint.py passes
+
+## Notes
+
+- 2026-03-22 agent: Part of pure skill pack pivot.

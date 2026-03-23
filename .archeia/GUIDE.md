@@ -6,7 +6,7 @@ Three install options:
 
 **Claude Code plugin** (recommended for local dev):
 ```shell
-claude --plugin-dir ./archeia-plugin
+claude --plugin-dir ./plugins/archeia
 ```
 
 **Claude Code skills** (copy into any project):
@@ -62,7 +62,7 @@ Use them to:
 
 Do not over-template the writing. The template should guide the document, not replace repo-specific thinking.
 
-After editing templates, run `bash scripts/sync-templates.sh` to propagate changes to the plugin and agent-skills distributions.
+After editing templates, run `bash scripts/sync-skills.sh` to propagate changes to the plugin and agent-skills distributions.
 
 ## Shipping Changes
 
