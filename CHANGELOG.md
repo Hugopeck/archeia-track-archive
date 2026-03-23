@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/Hugopeck/archeia/compare/v1.2.0...v1.3.0) (2026-03-23)
+
+
+### Features
+
+* **track:** formalize governance and task layout ([#5](https://github.com/Hugopeck/archeia/issues/5)) ([f704574](https://github.com/Hugopeck/archeia/commit/f704574cfc39047a656f3e330921add491eedd6b))
+
 # [1.2.0](https://github.com/Hugopeck/archeia/compare/v1.1.0...v1.2.0) (2026-03-23)
 
 
