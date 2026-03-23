@@ -14,10 +14,10 @@ Initialize Track in a repository.
 1. Check if `.track/` exists — warn before overwriting.
 2. Create: `.track/tasks/{triage,todo,active,review,done,cancelled,claims}/` with `.gitkeep` files.
 3. Write `.track/config.yaml` with defaults (see PROTOCOL.md). Include scopes if user specified them.
-4. Write `.track/.gitignore`: `index.json` and `BOARD.md`.
+4. Write `.track/.gitignore` with `index.json`, and ensure the repo-root `.gitignore` ignores `PROJECTS.md`, `TASKS.md`, and `BOARD.md`.
 5. Write `.track/PROTOCOL.md` from the canonical template.
 6. Optionally generate `.github/workflows/track-ci.yml`.
-7. Write empty BOARD.md and index.json.
+7. Write empty repo-root `PROJECTS.md`, `TASKS.md`, `BOARD.md`, and `.track/index.json`.
 
 ## Response
 

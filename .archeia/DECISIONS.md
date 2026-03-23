@@ -3,6 +3,7 @@
 <!-- DECISION INDEX (agents: scan this first, load full entries as needed)
 | Date       | Domain       | Title                                                          | Status     |
 |------------|--------------|----------------------------------------------------------------|------------|
+| 2026-03-23 | Product      | D-035: Instruction architecture before workflow machinery     | Accepted   |
 | 2026-03-22 | Distribution | D-034: Plugin conversion (dual-format)                         | Accepted   |
 | 2026-03-21 | Product      | D-027: Kill the scanner as V0 product                          | Accepted   |
 | 2026-03-21 | Product      | D-028: Kill the cloud service                                  | Accepted   |
@@ -38,6 +39,22 @@
 | 2026-03-17 | Product      | D-016: Conductor as Phase 1 host environment                  | Accepted   |
 | 2026-03-16 | Research     | D-017: Experiments 2 and 3 deferred                           | Accepted   |
 -->
+
+---
+
+
+## 2026-03-23 — D-035: Instruction architecture before workflow machinery
+
+**Domain:** Product
+**Status:** Accepted
+
+**Context:** Comparing Track's generated board with a simpler manual TODO system showed that strong templates, clear ownership, and readable views outperform thin automated exhaust.
+
+**Decision:** Prefer canonical markdown records + strong instructions + opinionated derived views before adding more orchestration or tooling.
+
+**Consequences:**
+- Invest first in templates, doc contracts, and projections.
+- Treat extra systems as a follow-on only if the simpler approach fails.
 
 ---
 

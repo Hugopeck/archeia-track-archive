@@ -7,6 +7,8 @@ These are tie-breakers for when multiple choices are valid.
 - Prefer skill instructions over compiled binaries.
 - Prefer templates over larger generation pipelines.
 - Prefer the agent's native capabilities over custom tooling.
+- Prefer stronger instructions and templates over new workflow machinery when capable agents can already do the work.
+- Prefer readable, opinionated markdown projections over generic generated status dumps.
 - Prefer pull-request confirmation over custom approval flows.
 - Prefer maintaining a few critical docs well over generating many shallow docs.
 

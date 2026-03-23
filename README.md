@@ -38,6 +38,9 @@ Track keeps multi-agent coordination inside the repository:
 - `.track/tasks/{triage,todo,active,review,done,cancelled}/` — task states
 - `.track/tasks/claims/` — advisory task claims
 - `.track/tasks/README.md` — task-state and claim-layout overview
+- `PROJECTS.md` — gitignored root portfolio view generated from Track state
+- `TASKS.md` — gitignored root task index generated from Track state
+- `BOARD.md` — gitignored root kanban generated from Track state
 
 Plugin commands:
 
@@ -63,6 +66,8 @@ Copy the canonical skill directories from `.claude/skills/` into your repo's `.c
 - Archeia: `.claude/skills/archeia/`, `.claude/skills/archeia-ask/`
 - Track: `.claude/skills/track-*/`
 
+Shared Conductor workspaces can also use the committed `conductor.json` to prebuild the local Track views on setup and run a watcher from the Run button.
+
 ### skills.sh / Codex / Cursor distribution
 
 Use the generated `skills/` directories with tools that consume the Agent Skills format.
@@ -77,21 +82,28 @@ Use the generated `skills/` directories with tools that consume the Agent Skills
 - Archeia protocol lives in `.archeia/PROTOCOL.md`
 - Sync generated distributions with `bash scripts/sync-skills.sh`
 - Verify generated copies with `bash scripts/sync-skills.sh --check`
+- Refresh local derived views with `bash scripts/track-build.sh`
+- Conductor `setup` builds `PROJECTS.md`, `TASKS.md`, `BOARD.md`, and `.track/index.json` for each new workspace
+- Conductor `run` launches `bash scripts/track-watch.sh` for live local refresh of all Track views
 - Validate Track dogfooding with `python3 tools/track-lint.py`
 - Run Track validator tests with `python3 tools/tests/test_track_lint.py`
+- Run Track board/index tests with `python3 tools/tests/test_track_build.py`
 
-`tools/track-lint.py` requires `pyyaml` when run locally.
+`tools/track-lint.py` and `tools/track-build.py` require `pyyaml` when run locally.
 
 ## Layout
 
 - `plugins/` — Claude Code plugin distributions
 - `skills/` — skills.sh / Codex / Cursor distributions
 - `scripts/` — maintenance scripts
-- `tools/` — deterministic validation tooling
+- `tools/` — deterministic validation and derived-view tooling
 - `docs/ONTOLOGY.md` — shared ontology and source-of-truth hierarchy
 - `.claude/skills/` — canonical skill sources
 - `.track/` — Track dogfooding workspace
 - `.track/projects/` — Track project briefs
+- `PROJECTS.md` — gitignored root portfolio view derived from Track state
+- `TASKS.md` — gitignored root task index derived from Track state
+- `BOARD.md` — gitignored root kanban view derived from Track state
 - `.archeia/` — Archeia's own product docs
 
 ## License

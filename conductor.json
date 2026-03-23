@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "setup": "bash scripts/track-build.sh",
+    "run": "bash scripts/track-watch.sh"
+  },
+  "runScriptMode": "nonconcurrent"
+}

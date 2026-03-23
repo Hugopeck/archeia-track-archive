@@ -21,10 +21,16 @@ plugins/                      <- Claude Code plugin distributions
   track/                      <- /track:* commands
 skills/                       <- skills.sh / Codex / Cursor distributions
 scripts/                      <- Maintenance scripts (skill sync, commit checks)
-tools/                        <- Deterministic validation tooling
+tools/                        <- Deterministic validation and board tooling
+PROJECTS.md                   <- Gitignored root portfolio view derived from Track state
+TASKS.md                      <- Gitignored root task index derived from Track state
+BOARD.md                      <- Gitignored root kanban view derived from Track state
 .track/                       <- Track protocol + dogfooding workspace
-  tasks/                      <- Track task states and claims
+  config.yaml                 <- Track registry for vocabularies, projects, and counters
   projects/                   <- Track project briefs for active initiatives
+    README.md                 <- Project brief contract and required sections
+  tasks/                      <- Track task states and claims
+    README.md                 <- Task/claim layout and ID conventions
 .archeia/                     <- Archeia's own product docs
 docs/ONTOLOGY.md              <- Shared ontology + authority hierarchy
 docs/designs/                 <- Strategic design documents
@@ -35,8 +41,9 @@ docs/designs/                 <- Strategic design documents
 - **Canonical source is `.claude/skills/`** — edit canonical skills first, then sync distributions
 - **Skills are markdown-first** — product behavior lives in `SKILL.md`, templates, and `.track/PROTOCOL.md`
 - **Protocols own durable contracts** — shared terms live in `docs/ONTOLOGY.md`, Track rules in `.track/PROTOCOL.md`, Archeia rules in `.archeia/PROTOCOL.md`
+- **Registry and briefs have separate jobs** — `.track/config.yaml` owns Track vocabulary, project membership, and counters; `.track/projects/*.md` owns narrative scope and success definition
 - **Track protocol is strict** — do not silently widen schema, status vocabulary, or claim rules
-- **Maintenance tooling is local** — `scripts/sync-skills.sh` and `tools/track-lint.py` keep distributions and `.track/` honest
+- **Maintenance tooling is local** — `scripts/sync-skills.sh`, `tools/track-lint.py`, and `tools/track-build.py` keep distributions and local Track views honest
 - **`.archeia/` is self-referential** — it documents this repo's own product architecture
 
 ## Working in This Repo
@@ -48,10 +55,12 @@ When modifying Archeia:
 4. Update `.archeia/` docs when Archeia's product direction, layout, or maintenance flow changes
 
 When modifying Track:
-1. Read `.track/PROTOCOL.md` before changing task schema, validation rules, or skill behavior
+1. Read `.track/PROTOCOL.md` and `docs/ONTOLOGY.md` before changing task schema, validation rules, or skill behavior
 2. Edit `.claude/skills/track-*/` directly
-3. Keep `tools/track-lint.py`, `.track/PROTOCOL.md`, and Track skill behavior aligned in the same change
-4. Run `python3 tools/track-lint.py` and `python3 tools/tests/test_track_lint.py` when Track rules or tooling change
+3. Treat `.track/config.yaml` as the machine-readable registry and `.track/projects/*.md` as the narrative scope contract
+4. Keep `tools/track-lint.py`, `tools/track-build.py`, `.track/PROTOCOL.md`, `.track/tasks/README.md`, and `.track/projects/README.md` aligned in the same change when rules move
+5. Refresh local derived views with `bash scripts/track-build.sh` after Track state changes or skill updates that affect the board
+6. Run `python3 tools/track-lint.py`, `python3 tools/tests/test_track_lint.py`, and `python3 tools/tests/test_track_build.py` when Track rules or tooling change
 
 When modifying distributions:
 1. Do not hand-edit generated copies in `plugins/*/skills/` or `skills/*/` unless you are fixing the sync process itself
@@ -62,4 +71,6 @@ When modifying distributions:
 - Do not add a CLI, daemon, or cloud service
 - Do not edit generated skill copies instead of the canonical source
 - Do not silently widen Track's schema, statuses, priorities, types, or modes
+- Do not reintroduce legacy flat `.track/{status}/` task paths or `.track/claims/` claim paths
+- Do not hand-edit `PROJECTS.md`, `TASKS.md`, `BOARD.md`, or `.track/index.json`; rebuild them from canonical Track state
 - Do not modify `.archeia/` docs casually — they describe the repo's actual product architecture
