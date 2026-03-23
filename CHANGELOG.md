@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/Hugopeck/archeia/compare/v1.1.0...v1.2.0) (2026-03-23)
+
+
+### Features
+
+* **repo:** merge Track into Archeia monorepo ([#4](https://github.com/Hugopeck/archeia/issues/4)) ([5ad60fb](https://github.com/Hugopeck/archeia/commit/5ad60fbe977cb6fab8dd92066ecc468aa543f940))
+
 # [1.1.0](https://github.com/Hugopeck/archeia/compare/v1.0.0...v1.1.0) (2026-03-22)
 
 
