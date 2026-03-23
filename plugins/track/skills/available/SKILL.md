@@ -12,10 +12,10 @@ Find tasks ready to claim and work on.
 ## Workflow
 
 1. Read `.track/PROTOCOL.md` if you haven't already this session.
-2. Read all task files in `.track/todo/`.
+2. Read all task files in `.track/tasks/todo/`.
 3. For each task, check availability:
-   a. Dependencies resolved: all `depends_on` targets in `.track/done/`.
-   b. Not claimed: no active (non-expired) claim in `.track/claims/`.
+   a. Dependencies resolved: all `depends_on` targets in `.track/tasks/done/`.
+   b. Not claimed: no active (non-expired) claim in `.track/tasks/claims/`.
    c. No file scope overlap: task's `files:` patterns don't overlap with any actively claimed task's `files:`.
 4. Present available tasks sorted by priority then ID.
 5. If nothing available, explain why.

@@ -1,5 +1,8 @@
 # Roadmap
 
+Operational work items live in `.track/`. This document covers strategic
+direction, product shape, and historical mapping only.
+
 ## Current Product Shape
 
 Archeia is a skill-based product distributed as a Claude Code plugin:
@@ -31,23 +34,24 @@ We evaluated Claude Code lifecycle hooks (PostToolUse, Stop, SessionStart, PostC
 
 See `docs/designs/plugin-extensibility.md` for the full analysis.
 
-## Features
+## Strategic Themes
 
 ### Distribution
-- [ ] F-001: Claude Code plugin with `/archeia:init` and `/archeia:ask` skills
-- [ ] F-002: Official Anthropic marketplace submission
-- [ ] F-003: Standalone skill files maintained alongside plugin
+
+Archeia should remain easy to install in the primary environments we care
+about: Claude Code plugins plus generated standalone skill distributions.
 
 ### Knowledge Base Generation
-- [ ] F-004: `/archeia:init` skill initializes and updates `.archeia/`, `AGENTS.md`, and `CLAUDE.md`
-- [ ] F-005: `/archeia:ask` answers architecture questions from the generated knowledge base
-- [ ] F-006: Template set for framework docs and colocated README generation
-- [ ] F-007: Doc migration flow that offers to absorb existing architecture docs
+
+The write path should keep getting better at producing evidence-backed guidance,
+asking higher-value Layer 2 questions, and preserving human-authored nuance when
+existing docs are absorbed.
 
 ### Maintenance
-- [ ] F-008: GitHub Action template for scheduled or on-PR drift detection
-- [ ] F-009: Pull request template that makes doc confirmation happen through review
-- [ ] F-010: `archeia check` for CI-ready deterministic drift detection
+
+Maintenance should stay git-native: inline updates, PR-time confirmation, or
+CI-time checks. Hooks, services, or hidden automation do not belong in the core
+product unless they solve a problem the current workflow cannot.
 
 ## What We Learned
 
@@ -79,3 +83,21 @@ Possible directions without commitment:
 - gstack integration (architecture-aware /review and /plan-eng-review)
 
 No scanner revival, Rust rewrite, or cloud roadmap belongs in the plan unless user evidence makes it necessary.
+
+## Historical Feature Mapping
+
+These IDs are preserved so older design docs and decisions remain resolvable.
+They are historical references, not the active backlog.
+
+| Historical ID | Meaning at the time | Current interpretation |
+|---------------|---------------------|------------------------|
+| F-001 | Claude Code plugin with `/archeia:init` and `/archeia:ask` | Core distribution direction; plugin remains primary |
+| F-002 | Official Anthropic marketplace submission | Deferred distribution follow-on; not an active roadmap commitment |
+| F-003 | Standalone skill files alongside plugin | Still part of the supported distribution model |
+| F-004 | `/archeia:init` initializes and updates guidance surfaces | Core write-path capability |
+| F-005 | `/archeia:ask` answers from generated knowledge base | Query-path capability tracked operationally in `.track/` |
+| F-006 | Template set for framework docs and colocated README generation | Template-contract evolution theme |
+| F-007 | Doc migration flow that absorbs existing architecture docs | Migration/absorption capability theme |
+| F-008 | GitHub Action template for drift detection | Maintenance automation theme tracked operationally in `.track/` |
+| F-009 | PR template for confirmation flow | Maintenance workflow theme tracked operationally in `.track/` |
+| F-010 | `archeia check` deterministic drift detection | Future deterministic maintenance capability tracked operationally in `.track/` |

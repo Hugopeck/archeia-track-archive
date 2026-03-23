@@ -15,42 +15,50 @@ the runtime.
 
 ```
 .track/
-├── config.yaml          # Schema, vocabulary, projects, id_counter
+├── config.yaml          # Schema, project registry, and numbering counters
 ├── PROTOCOL.md          # This file — protocol specification
-├── triage/              # Tasks not yet ready to work
-├── todo/                # Tasks ready to be claimed and worked
-├── active/              # Tasks currently being worked
-├── review/              # Tasks awaiting review
-├── done/                # Completed tasks
-├── cancelled/           # Cancelled tasks
-├── claims/              # Advisory claim files (one per claimed task)
+├── projects/            # Project briefs for active projects
+├── tasks/               # Task state folders + claims
+│   ├── triage/          # Tasks not yet ready to work
+│   ├── todo/            # Tasks ready to be claimed and worked
+│   ├── active/          # Tasks currently being worked
+│   ├── review/          # Tasks awaiting review
+│   ├── done/            # Completed tasks
+│   ├── cancelled/       # Cancelled tasks
+│   └── claims/          # Advisory claim files (one per claimed task)
 ├── index.json           # Derived, gitignored — machine-readable task index
 ├── BOARD.md             # Derived, gitignored — human-readable board view
 └── .gitignore           # Ignores index.json and BOARD.md
 ```
 
+Quick orientation:
+
+- `.track/projects/README.md` explains project brief naming and required sections
+- `.track/tasks/README.md` explains task-state folders, dotted task IDs, and claims
+
 ## Task File Format
 
-Every task is a markdown file at `.track/{status}/{id}-{slug}.md`.
+Every task is a markdown file at `.track/tasks/{status}/{id}-{slug}.md`.
 
 ### Filename Convention
 
-- `{id}` is a zero-padded 3-digit number (e.g., `001`, `042`)
+- New-style `{id}` is `{project}.{task}` (e.g., `4.2`, `1.1`)
+- Legacy archived tasks may still use zero-padded numeric IDs (e.g., `001`, `042`)
 - `{slug}` is a lowercase hyphenated summary (e.g., `add-claim-protocol`)
-- Full example: `.track/todo/042-add-claim-protocol.md`
+- Full example: `.track/tasks/todo/4.2-add-claim-protocol.md`
 
 ### Frontmatter Schema
 
 ```yaml
 ---
-id: "042"
+id: "4.2"
 title: "[Implement] Add claim protocol for multi-agent coordination"
 status: todo
 mode: implement
 priority: high
 type: feature
 scopes: []              # Optional, must match config.yaml scopes
-project: coordination   # Optional, must match config.yaml projects
+project: "4"           # Required for new-style task IDs; must match config.yaml projects
 cycle: "2026-W13"       # Optional, ISO week format YYYY-Www
 created: 2026-03-22
 updated: 2026-03-22
@@ -68,6 +76,64 @@ files:                   # Optional, list of glob patterns for file ownership
 
 Every task must have: `id`, `title`, `status`, `mode`, `priority`, `type`,
 `created`, `updated`, `depends_on`.
+
+## Project Registry
+
+Projects are first-class Track objects with two surfaces:
+
+- `.track/config.yaml` is the machine-readable registry
+- `.track/projects/{project-key}.md` is the narrative scope contract
+
+Tasks may reference a project by key through frontmatter, but they do not own a
+project's goal, scope, or success definition.
+
+### Registry Rules
+
+Each project entry in `.track/config.yaml` must include:
+
+- active project key as a quoted integer string (`"1"`, `"2"`, `"3"`)
+- `title` — required human-readable title
+- `description` — required one-sentence summary
+- `status` — required, one of `active` or `archived`
+- `brief` — required for active projects, optional for archived projects
+- `task_counter` — required for active projects; next available task number within that project
+
+`.track/config.yaml` also includes `project_counter`, the next available active
+project number.
+
+Open tasks (`triage`, `todo`, `active`, `review`) may reference only `active`
+projects. Historical tasks (`done`, `cancelled`) may reference archived projects.
+Open tasks must use the `{project}.{task}` ID format. Legacy numeric IDs remain
+valid only for historical tasks.
+
+### Project Brief Contract
+
+Each active project must have a brief at `.track/projects/{project-key}-{slug}.md`.
+
+Project briefs are markdown-only in this phase. Do not add frontmatter.
+
+Required shape:
+
+```markdown
+# {Project Title}
+
+## Goal
+## Why Now
+## In Scope
+## Out Of Scope
+## Shared Context
+## Dependency Notes
+## Success Definition
+## Candidate Task Seeds
+```
+
+Rules:
+
+- H1 must match `projects.{key}.title`
+- the brief path must match `projects.{key}.brief`
+- active project brief paths should begin with `projects/{project-key}-`
+- the brief owns narrative scope; `config.yaml` owns machine-readable metadata
+- archived projects may omit a brief when they only exist for historical task references
 
 ### Body Sections
 
@@ -114,7 +180,7 @@ mode: {investigate|plan|implement}
 priority: medium
 type: {bug|feature|improvement|debt|infra|spike}
 scopes: []
-project:
+project: "{project_number}"
 cycle:
 created: {today}
 updated: {today}
@@ -147,7 +213,8 @@ State the objective and expected output.
 
 ### Task Template (todo — implement)
 
-Same as triage but with status `todo` and all ready gate fields filled:
+Same as triage but with status `todo` and all ready gate fields filled. New
+tasks should use dotted IDs derived from the project's `task_counter`.
 - Problem section has 20+ characters of real content
 - Affected Files lists concrete paths
 - Verification has at least one step
@@ -221,9 +288,9 @@ workspace from working on the same task or overlapping file scopes.
 ### Claim File Format
 
 ```yaml
-# .track/claims/{task-id}.md
+# .track/tasks/claims/{task-id}.md
 ---
-task_id: "042"
+task_id: "4.2"
 agent: "conductor-workspace-melbourne"
 claimed_at: "2026-03-22T17:20:00Z"
 files:
@@ -235,7 +302,7 @@ expires_at: "2026-03-22T23:20:00Z"  # 6-hour TTL
 
 ### Claiming Rules
 
-1. Before claiming, check `.track/claims/` for an existing claim on the same task
+1. Before claiming, check `.track/tasks/claims/` for an existing claim on the same task
 2. If a claim exists and is not expired → fail, report who holds the claim
 3. If a claim exists but is expired → treat as stale, proceed
 4. Write the claim file with a 6-hour TTL
@@ -270,6 +337,8 @@ These rules are enforced by `tools/track-lint.py` in CI and by the `track-valida
 - `status`, `priority`, `type`, `mode` values in config.yaml vocabulary
 - `scopes` values in config.yaml scopes list
 - `project` value in config.yaml projects
+- open tasks must use `{project}.{task}` IDs and match the project key
+- open tasks may not reference archived projects
 - `cycle` matches ISO week format `YYYY-Www`
 - `cancelled_reason` present and non-empty when status is `cancelled`
 - No unknown frontmatter fields (known: id, title, status, mode, priority, type,
@@ -293,6 +362,7 @@ These rules are enforced by `tools/track-lint.py` in CI and by the `track-valida
 - No self-references in `depends_on`
 - No circular dependencies (DFS cycle detection)
 - `active`/`review`/`done` tasks: all `depends_on` targets must be in `done`
+- active projects in config have valid briefs with the required structure
 
 ### Claim Checks
 - Claim files reference existing tasks
@@ -329,13 +399,27 @@ types:
   - spike
 scopes: []
 projects:
-  project-key:
+  '1':
     title: "Human-readable title"
-    description: "Optional description"
-id_counter: 1
+    description: "Required one-sentence summary"
+    status: active
+    brief: projects/1-project-name.md
+    task_counter: 1
+project_counter: 2
 ```
 
-`id_counter` tracks the next available task ID. Increment it after creating a new task.
+`task_counter` tracks the next available task number within a project.
+`project_counter` tracks the next available active project number.
+
+Archived project example:
+
+```yaml
+projects:
+  old-project:
+    title: "Historical project"
+    description: "Retained for done and cancelled task references."
+    status: archived
+```
 
 ## Derived Views
 
@@ -363,7 +447,7 @@ Generated from the same data as index.json. Gitignored.
 
 | Skill | Purpose | Mutates .track/? |
 |-------|---------|-----------------|
-| track-new | Create a task file, increment id_counter | Yes |
+| track-new | Create a task file, increment project task_counter | Yes |
 | track-move | Move task between status directories | Yes |
 | track-show | Display a single task | No |
 | track-list | List/filter tasks | No |

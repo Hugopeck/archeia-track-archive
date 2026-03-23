@@ -12,7 +12,7 @@ Display a single Track task by finding and reading its file.
 ## Workflow
 
 1. Read `.track/PROTOCOL.md` if you haven't already this session.
-2. Search `.track/` status directories for file matching `{id}-*.md`.
+2. Search `.track/tasks/` status directories for file matching `{id}-*.md`.
 3. Present full contents: frontmatter and body sections.
 4. Note any PROTOCOL.md violations if file looks malformed.
 

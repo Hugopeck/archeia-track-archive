@@ -12,7 +12,7 @@ Initialize Track in a repository.
 ## Workflow
 
 1. Check if `.track/` exists — warn before overwriting.
-2. Create: `.track/{triage,todo,active,review,done,cancelled,claims}/` with `.gitkeep` files.
+2. Create: `.track/tasks/{triage,todo,active,review,done,cancelled,claims}/` with `.gitkeep` files.
 3. Write `.track/config.yaml` with defaults (see PROTOCOL.md). Include scopes if user specified them.
 4. Write `.track/.gitignore`: `index.json` and `BOARD.md`.
 5. Write `.track/PROTOCOL.md` from the canonical template.

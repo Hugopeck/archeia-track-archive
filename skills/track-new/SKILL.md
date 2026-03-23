@@ -1,6 +1,6 @@
 ---
 name: track-new
-description: Create a new Track task file inside `.track/triage/` or `.track/todo/`, increment `.track/config.yaml` `id_counter`, and validate the result.
+description: Create a new Track task file inside `.track/tasks/triage/` or `.track/tasks/todo/`, allocate a `{project}.{task}` ID from `.track/config.yaml`, and validate the result.
 ---
 
 # Track New
@@ -12,11 +12,12 @@ Create a new Track task by editing repo files directly.
 ## Workflow
 
 1. Read `.track/PROTOCOL.md` if you haven't already this session.
-2. Load `.track/config.yaml` and note `id_counter`. New task ID = zero-padded counter (e.g., `042`).
-3. Gather inputs: title, status (triage/todo, default triage), mode (investigate/plan/implement), priority (default medium), type (default bug), optional project/cycle/depends_on/files.
-4. Write task file at `.track/{status}/{id}-{slug}.md` following PROTOCOL.md template.
+2. Load `.track/config.yaml` and choose the target project. For new-style tasks, `project` is required.
+3. Read the target project's `task_counter`. New task ID = `{project}.{task_counter}` (e.g., `4.2`).
+4. Gather inputs: title, status (triage/todo, default triage), mode (investigate/plan/implement), priority (default medium), type (default bug), project, optional cycle/depends_on/files.
+5. Write task file at `.track/{status}/{id}-{slug}.md` following PROTOCOL.md template.
 5. Always include `depends_on: []` unless the user names blockers.
-6. Increment `id_counter` in config.yaml.
+6. Increment that project's `task_counter` in config.yaml.
 7. Run `track-validate` skill or verify against PROTOCOL.md rules.
 
 ## Writing Rules

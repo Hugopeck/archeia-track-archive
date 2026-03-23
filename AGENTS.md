@@ -23,7 +23,10 @@ skills/                       <- skills.sh / Codex / Cursor distributions
 scripts/                      <- Maintenance scripts (skill sync, commit checks)
 tools/                        <- Deterministic validation tooling
 .track/                       <- Track protocol + dogfooding workspace
+  tasks/                      <- Track task states and claims
+  projects/                   <- Track project briefs for active initiatives
 .archeia/                     <- Archeia's own product docs
+docs/ONTOLOGY.md              <- Shared ontology + authority hierarchy
 docs/designs/                 <- Strategic design documents
 ```
 
@@ -31,6 +34,7 @@ docs/designs/                 <- Strategic design documents
 
 - **Canonical source is `.claude/skills/`** — edit canonical skills first, then sync distributions
 - **Skills are markdown-first** — product behavior lives in `SKILL.md`, templates, and `.track/PROTOCOL.md`
+- **Protocols own durable contracts** — shared terms live in `docs/ONTOLOGY.md`, Track rules in `.track/PROTOCOL.md`, Archeia rules in `.archeia/PROTOCOL.md`
 - **Track protocol is strict** — do not silently widen schema, status vocabulary, or claim rules
 - **Maintenance tooling is local** — `scripts/sync-skills.sh` and `tools/track-lint.py` keep distributions and `.track/` honest
 - **`.archeia/` is self-referential** — it documents this repo's own product architecture

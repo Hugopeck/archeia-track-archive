@@ -36,6 +36,7 @@ KNOWN_FIELDS = {
 }
 
 VALID_MODES = {"investigate", "plan", "implement"}
+VALID_PROJECT_STATUSES = {"active", "archived"}
 
 # Legacy field — warn but don't error
 LEGACY_FIELDS = {"agent_ready"}
@@ -53,10 +54,22 @@ REQUIRED_SECTIONS = [
 ]
 
 READY_GATE_STATUSES = {"todo", "active", "review", "done"}
+OPEN_TASK_STATUSES = {"triage", "todo", "active", "review"}
+
+PROJECT_REQUIRED_SECTIONS = [
+    "## Goal",
+    "## Why Now",
+    "## In Scope",
+    "## Out Of Scope",
+    "## Shared Context",
+    "## Dependency Notes",
+    "## Success Definition",
+    "## Candidate Task Seeds",
+]
 
 CYCLE_PATTERN = re.compile(r"^\d{4}-W(0[1-9]|[1-4]\d|5[0-3])$")
-
-FILENAME_ID_PATTERN = re.compile(r"^(\d{3,})-[a-z0-9-]+\.md$")
+LEGACY_TASK_ID_PATTERN = re.compile(r"^\d{3,}$")
+DOTTED_TASK_ID_PATTERN = re.compile(r"^(\d+)\.(\d+)$")
 
 
 # ---------------------------------------------------------------------------
@@ -131,9 +144,15 @@ def parse_frontmatter(fm_str, path):
     if not isinstance(data, dict):
         return None, [Issue(path, "frontmatter must be a YAML mapping")]
 
-    # Coerce id to zero-padded string (YAML parses unquoted 001 as int 1)
+    # Coerce scalar IDs to strings. YAML parses unquoted 001 as int 1 and 4.1 as float 4.1.
     if "id" in data and not isinstance(data["id"], str):
-        data["id"] = str(data["id"]).zfill(3)
+        if isinstance(data["id"], int):
+            data["id"] = str(data["id"]).zfill(3)
+        else:
+            data["id"] = str(data["id"])
+
+    if "project" in data and data["project"] is not None and not isinstance(data["project"], str):
+        data["project"] = str(data["project"])
 
     return data, []
 
@@ -145,6 +164,8 @@ def parse_frontmatter(fm_str, path):
 def validate_schema(fm, body, path, config):
     """Config-backed frontmatter validation."""
     issues = []
+
+    task_id = str(fm.get("id", "")) if fm.get("id") is not None else ""
 
     # Required fields
     for field in REQUIRED_FIELDS:
@@ -205,6 +226,129 @@ def validate_schema(fm, body, path, config):
     config_projects = config.get("projects", {})
     if project and project not in config_projects:
         issues.append(Issue(path, f"project '{project}' is not defined in config.yaml"))
+    elif project:
+        project_info = config_projects.get(project, {})
+        project_status = project_info.get("status") if isinstance(project_info, dict) else None
+        task_status = fm.get("status", "")
+        if project_status == "archived" and task_status in OPEN_TASK_STATUSES:
+            issues.append(Issue(path, f"open tasks may not reference archived project '{project}'"))
+
+    # Task ID format
+    dotted_match = DOTTED_TASK_ID_PATTERN.match(task_id)
+    legacy_match = LEGACY_TASK_ID_PATTERN.match(task_id)
+    task_status = fm.get("status", "")
+
+    if not task_id:
+        pass
+    elif dotted_match:
+        dotted_project = dotted_match.group(1)
+        if not project:
+            issues.append(Issue(path, "dotted task IDs require project"))
+        elif project != dotted_project:
+            issues.append(Issue(path, f"task id '{task_id}' must match project '{project}'"))
+    elif legacy_match:
+        if task_status in OPEN_TASK_STATUSES:
+            issues.append(Issue(path, "open tasks must use dotted {project}.{task} IDs"))
+    else:
+        issues.append(Issue(path, f"task id '{task_id}' must be legacy numeric or dotted project.task"))
+
+    return issues
+
+
+def validate_project_registry(config, track_dir):
+    """Validate config-backed project metadata and active project briefs."""
+    issues = []
+    config_path = track_dir / "config.yaml"
+    projects = config.get("projects", {})
+    project_counter = config.get("project_counter")
+
+    if project_counter is None:
+        issues.append(Issue(config_path, "config must define project_counter"))
+    elif not isinstance(project_counter, int) or project_counter < 1:
+        issues.append(Issue(config_path, "project_counter must be a positive integer"))
+
+    if not isinstance(projects, dict):
+        return [Issue(config_path, "projects must be a YAML mapping")]
+
+    active_numeric_keys = []
+
+    for project_key, project_info in projects.items():
+        if not isinstance(project_info, dict):
+            issues.append(Issue(config_path, f"project '{project_key}' must be a YAML mapping"))
+            continue
+
+        title = project_info.get("title")
+        description = project_info.get("description")
+        status = project_info.get("status")
+        brief = project_info.get("brief")
+        task_counter = project_info.get("task_counter")
+
+        if not title or not isinstance(title, str) or not title.strip():
+            issues.append(Issue(config_path, f"project '{project_key}' must define a non-empty title"))
+
+        if not description or not isinstance(description, str) or not description.strip():
+            issues.append(Issue(config_path, f"project '{project_key}' must define a non-empty description"))
+
+        if status not in VALID_PROJECT_STATUSES:
+            issues.append(Issue(config_path, f"project '{project_key}' must define status 'active' or 'archived'"))
+            continue
+
+        if status == "active" and (not brief or not isinstance(brief, str) or not brief.strip()):
+            issues.append(Issue(config_path, f"active project '{project_key}' must define brief"))
+            continue
+
+        if status == "active":
+            if not str(project_key).isdigit():
+                issues.append(Issue(config_path, f"active project '{project_key}' must use a numeric key"))
+            else:
+                active_numeric_keys.append(int(project_key))
+
+            if not isinstance(task_counter, int) or task_counter < 1:
+                issues.append(Issue(config_path, f"active project '{project_key}' must define positive integer task_counter"))
+
+            if brief and not brief.startswith(f"projects/{project_key}-"):
+                issues.append(Issue(config_path, f"active project '{project_key}' brief must start with projects/{project_key}-"))
+
+        if brief:
+            brief_path = track_dir / brief
+            issues.extend(validate_project_brief(project_key, title, brief_path, require_frontmatter_free=True))
+
+    if isinstance(project_counter, int) and active_numeric_keys:
+        expected_counter = max(active_numeric_keys) + 1
+        if project_counter != expected_counter:
+            issues.append(Issue(config_path, f"project_counter must equal next active project number ({expected_counter})"))
+
+    return issues
+
+
+def validate_project_brief(project_key, title, brief_path, require_frontmatter_free=False):
+    """Validate a project brief file against the Track protocol contract."""
+    issues = []
+
+    if not brief_path.exists():
+        return [Issue(brief_path, f"project '{project_key}' brief file does not exist")]
+
+    content = brief_path.read_text()
+    stripped = content.lstrip()
+    if require_frontmatter_free and stripped.startswith("---"):
+        issues.append(Issue(brief_path, "project briefs must not use frontmatter in phase 1"))
+
+    lines = content.splitlines()
+    first_content_line = next((line.strip() for line in lines if line.strip()), "")
+    expected_title = f"# {title}"
+    if first_content_line != expected_title:
+        issues.append(Issue(brief_path, f"project brief H1 must match config title '{title}'"))
+
+    positions = []
+    for section in PROJECT_REQUIRED_SECTIONS:
+        section_positions = [idx for idx, line in enumerate(lines) if line.strip() == section]
+        if not section_positions:
+            issues.append(Issue(brief_path, f"missing required section {section}"))
+            continue
+        positions.append(section_positions[0])
+
+    if len(positions) == len(PROJECT_REQUIRED_SECTIONS) and positions != sorted(positions):
+        issues.append(Issue(brief_path, "project brief sections must appear in protocol order"))
 
     return issues
 
@@ -448,9 +592,9 @@ def find_cycle(start_id, tasks_by_id):
 # ---------------------------------------------------------------------------
 
 def validate_claims(track_dir, tasks_by_id):
-    """Validate claim files in .track/claims/."""
+    """Validate claim files in .track/tasks/claims/."""
     issues = []
-    claims_dir = track_dir / "claims"
+    claims_dir = track_dir / TASKS_DIRNAME / "claims"
 
     if not claims_dir.exists():
         return issues
@@ -539,6 +683,7 @@ def globs_overlap(globs_a, globs_b):
 # ---------------------------------------------------------------------------
 
 STATUS_DIRS = ["triage", "todo", "active", "review", "done", "cancelled"]
+TASKS_DIRNAME = "tasks"
 
 
 def discover_tasks(track_dir):
@@ -546,8 +691,9 @@ def discover_tasks(track_dir):
     tasks = []
     parse_issues = []
 
+    tasks_root = track_dir / TASKS_DIRNAME
     for status_dir in STATUS_DIRS:
-        dir_path = track_dir / status_dir
+        dir_path = tasks_root / status_dir
         if not dir_path.exists():
             continue
 
@@ -617,6 +763,8 @@ def main():
     # Run all validations
     all_issues = list(parse_issues)
     today = datetime.now().date()
+
+    all_issues.extend(validate_project_registry(config, track_dir))
 
     for t in tasks:
         all_issues.extend(validate_schema(t["fm"], t["body"], t["path"], config))

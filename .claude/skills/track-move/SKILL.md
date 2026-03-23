@@ -1,6 +1,6 @@
 ---
 name: track-move
-description: Move an existing Track task between `.track/` status directories, update frontmatter, and validate.
+description: Move an existing Track task between `.track/tasks/` status directories, update frontmatter, and validate.
 ---
 
 # Track Move
