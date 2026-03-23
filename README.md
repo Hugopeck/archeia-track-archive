@@ -1,74 +1,91 @@
-# Archeia
+# Archeia Monorepo
 
-Architecture knowledge framework for AI coding agents.
+Local-first skill packs for AI coding agents.
 
-Type `/archeia`, and the agent stops making avoidable mistakes about the repo.
+This repo now ships two sibling products:
 
-## What it does
+- **Archeia** — generates and maintains architecture guidance that agents actually read
+- **Track** — coordinates parallel agent work through repo-local `.track/` task files
 
-Archeia generates and maintains architecture guidance that AI agents actually read:
+## Products
+
+### Archeia
+
+Archeia generates and maintains repo guidance such as:
 
 - `.archeia/` — knowledge base (architecture, decisions, constraints, standards)
 - `AGENTS.md` — behavioral contract for agent work
 - `CLAUDE.md` — Claude-specific workflow guide
 
-The docs stay current through normal git workflows, release automation, and PR-based review.
+Standalone commands:
+
+- `/archeia`
+- `/archeia-ask ...`
+
+Plugin commands:
+
+- `/archeia:init`
+- `/archeia:ask ...`
+
+### Track
+
+Track keeps multi-agent coordination inside the repository:
+
+- `.track/PROTOCOL.md` — task and claim protocol
+- `.track/config.yaml` — schema vocabulary and ID counter
+- `.track/{triage,todo,active,review,done,cancelled}/` — task states
+- `.track/claims/` — advisory task claims
+
+Plugin commands:
+
+- `/track:init`, `/track:new`, `/track:move`, `/track:show`, `/track:list`
+- `/track:board`, `/track:stats`, `/track:claim`, `/track:release`
+- `/track:available`, `/track:validate`, `/track:decompose`, `/track:plan`
 
 ## Install
 
-### Claude Code plugin
+### Claude Code plugins
 
-Run Archeia locally as a plugin during development and testing:
+Run either plugin locally during development and testing:
 
 ```shell
-claude --plugin-dir ./archeia-plugin
+claude --plugin-dir ./plugins/archeia
+claude --plugin-dir ./plugins/track
 ```
 
-Marketplace submission is planned later, after more testing.
+### Canonical Claude skills
 
-### Claude Code skills
+Copy the canonical skill directories from `.claude/skills/` into your repo's `.claude/skills/` directory.
 
-Copy `.claude/skills/archeia/` and `.claude/skills/archeia-ask/` into your project's `.claude/skills/` directory.
+- Archeia: `.claude/skills/archeia/`, `.claude/skills/archeia-ask/`
+- Track: `.claude/skills/track-*/`
 
-### Agent Skills format
+### skills.sh / Codex / Cursor distribution
 
-Copy `skills/archeia-init/` and `skills/archeia-ask/` into a compatible agent-skills directory for Codex CLI, Cursor, or other tools that use the Agent Skills spec.
+Use the generated `skills/` directories with tools that consume the Agent Skills format.
 
-## Usage
+- Archeia: `skills/archeia-init/`, `skills/archeia-ask/`
+- Track: `skills/track-*/`
 
-### Generate docs
+## Development
 
-```
-/archeia
-```
+- Canonical source lives in `.claude/skills/`
+- Sync generated distributions with `bash scripts/sync-skills.sh`
+- Verify generated copies with `bash scripts/sync-skills.sh --check`
+- Validate Track dogfooding with `python3 tools/track-lint.py`
+- Run Track validator tests with `python3 tools/tests/test_track_lint.py`
 
-Explores the repo, generates the knowledge base from templates, and writes `AGENTS.md` + `CLAUDE.md`.
+`tools/track-lint.py` requires `pyyaml` when run locally.
 
-Plugin command:
+## Layout
 
-```
-/archeia:init
-```
-
-### Ask questions
-
-```
-/archeia-ask how does the auth system work?
-```
-
-Loads the knowledge base and answers architecture questions with evidence paths.
-
-Plugin command:
-
-```
-/archeia:ask how does the auth system work?
-```
-
-## How it works
-
-Archeia is two skills plus templates. The agent is the scanner — Archeia provides the instructions, templates, and maintenance workflow that make the agent use its code-reading power well.
-
-The product outcome: docs that stay accurate after two weeks of real development.
+- `plugins/` — Claude Code plugin distributions
+- `skills/` — skills.sh / Codex / Cursor distributions
+- `scripts/` — maintenance scripts
+- `tools/` — deterministic validation tooling
+- `.claude/skills/` — canonical skill sources
+- `.track/` — Track dogfooding workspace
+- `.archeia/` — Archeia's own product docs
 
 ## License
 

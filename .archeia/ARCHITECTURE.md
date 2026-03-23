@@ -65,10 +65,10 @@ The skills primarily write:
 Archeia ships in three formats from a single source of truth:
 
 - **Claude Code skills** — `.claude/skills/archeia/` and `.claude/skills/archeia-ask/` (copy into any project)
-- **Claude Code plugin** — `archeia-plugin/` (install with `claude --plugin-dir`)
+- **Claude Code plugin** — `plugins/archeia/` (install with `claude --plugin-dir`)
 - **Agent Skills** — `skills/archeia-init/` and `skills/archeia-ask/` (for Codex CLI, Cursor, etc.)
 
-Templates are canonical in `.claude/skills/archeia/templates/` and synced to the other distributions via `scripts/sync-templates.sh`.
+Templates are canonical in `.claude/skills/archeia/templates/` and synced to the other distributions via `scripts/sync-skills.sh`.
 
 ## Repo Tooling
 

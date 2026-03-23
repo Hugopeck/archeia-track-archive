@@ -26,17 +26,15 @@ Ship Archeia as a Claude Code plugin AND maintain standalone skill files.
 ### Plugin Structure
 
 ```text
-archeia-plugin/
+plugins/archeia/
 ├── .claude-plugin/
 │   └── plugin.json          # name="archeia", version, description
-├── skills/
-│   ├── init/
-│   │   ├── SKILL.md         # /archeia:init (was /archeia)
-│   │   └── templates/       # same templates
-│   └── ask/
-│       └── SKILL.md         # /archeia:ask (was /archeia-ask)
-└── hooks/
-    └── hooks.json           # empty for now — ready for future use
+└── skills/
+    ├── init/
+    │   ├── SKILL.md         # /archeia:init (was /archeia)
+    │   └── templates/       # same templates
+    └── ask/
+        └── SKILL.md         # /archeia:ask (was /archeia-ask)
 ```
 
 ### Standalone Structure (unchanged)

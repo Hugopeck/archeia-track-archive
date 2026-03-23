@@ -11,3 +11,7 @@
 
 # Conductor
 .context/
+
+# Python
+__pycache__/
+*.pyc

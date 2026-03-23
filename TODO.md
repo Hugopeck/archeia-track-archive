@@ -78,7 +78,7 @@ Convert Archeia to a Claude Code plugin while maintaining standalone skill files
 - Create `skills/init/SKILL.md` (renamed from archeia, produces `/archeia:init`)
 - Create `skills/ask/SKILL.md` (renamed from archeia-ask, produces `/archeia:ask`)
 - Copy `templates/` into `skills/init/templates/`
-- Verify with `claude --plugin-dir ./archeia-plugin`
+- Verify with `claude --plugin-dir ./plugins/archeia`
 - Keep standalone `.claude/skills/archeia/` and `.claude/skills/archeia-ask/` alongside
 
 Design doc: `docs/designs/plugin-extensibility.md`
