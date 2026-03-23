@@ -18,8 +18,9 @@ Claim a task so other agents know you're working on it. Claims are advisory.
    - Exists and expired → treat as stale, proceed.
 4. Create `.track/tasks/claims/` if needed.
 5. Write `.track/tasks/claims/{task-id}.md` per PROTOCOL.md claim format (task_id, agent, claimed_at, files, expires_at with 6-hour TTL).
-6. Move task from `todo` to `active` using track-move workflow.
+6. Move task from `todo` to `active` using the `track-move` workflow, but treat board refresh as part of the overall claim flow rather than a separate second rebuild.
+7. Ensure the flow ends with one successful `bash scripts/track-build.sh` run.
 
 ## Response
 
-Report: claimed task ID/title, claim file path, expiry time.
+Report: claimed task ID/title, claim file path, expiry time, board refresh status.

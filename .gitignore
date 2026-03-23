@@ -15,3 +15,8 @@
 # Python
 __pycache__/
 *.pyc
+
+# Track
+BOARD.md
+PROJECTS.md
+TASKS.md

@@ -109,7 +109,7 @@ A non-canonical navigation surface that helps users find the real source of
 truth. Pointer documents summarize where to look but do not own the underlying
 state.
 
-Authoritative references: `TODO.md`, `.track/BOARD.md` (derived)
+Authoritative references: `TODO.md`, `PROJECTS.md` (derived), `TASKS.md` (derived), `BOARD.md` (derived)
 
 ## Document Families
 
@@ -126,7 +126,7 @@ Authoritative references: `TODO.md`, `.track/BOARD.md` (derived)
 - **Registry:** `.track/config.yaml`
 - **Narrative scope contracts:** `.track/projects/*.md`
 - **Operational work:** `.track/tasks/{triage,todo,active,review,done,cancelled}/`
-- **Executable contract:** `tools/track-lint.py`
+- **Executable contracts:** `tools/track-lint.py`, `tools/track-build.py`
 
 ## Change Rules
 

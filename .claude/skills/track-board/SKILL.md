@@ -1,24 +1,24 @@
 ---
 name: track-board
-description: Generate or read the Track board view from task files.
+description: Generate or read the Track kanban view from task files, alongside PROJECTS.md and TASKS.md.
 ---
 
 # Track Board
 
 ## Overview
 
-Display the Track board — tasks grouped by status.
+Display the Track kanban board — a vertical workflow view backed by the same generated PM surfaces as `PROJECTS.md` and `TASKS.md`.
 
 ## Workflow
 
 1. Read `.track/PROTOCOL.md` if you haven't already this session.
-2. If `.track/BOARD.md` exists and user just wants to see it, display it.
-3. To regenerate: read all task files, group by status (Active, Review, Todo, Triage), create table (ID | Title | Priority | Type | Mode | Depends On | Available), add summary line, write to `.track/BOARD.md`.
-4. Also regenerate `.track/index.json` if needed.
+2. If `BOARD.md` exists and the user just wants to see it, display it.
+3. If `BOARD.md` is missing or the user asks to regenerate, run `bash scripts/track-build.sh`.
+4. Display `BOARD.md`.
 
 ## Rules
 
-Only writes derived files (BOARD.md, index.json). Sort by priority then ID within each group.
+Only writes derived files (`PROJECTS.md`, `TASKS.md`, `BOARD.md`, `.track/index.json`). `BOARD.md` is the kanban view.
 
 ## Response
 

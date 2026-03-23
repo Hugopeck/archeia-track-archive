@@ -16,7 +16,8 @@ Release a task claim so other agents can pick it up.
    - Exists → delete it.
    - Doesn't exist → warn "No active claim found for task {id}."
 3. Task status is NOT automatically changed. Move the task separately with track-move.
+4. Run `bash scripts/track-build.sh` to refresh local derived views.
 
 ## Response
 
-Report: released task ID, whether claim was found and removed.
+Report: released task ID, whether claim was found and removed, board refresh status.
