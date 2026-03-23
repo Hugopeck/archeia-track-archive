@@ -21,7 +21,7 @@ Validate the entire `.track/` directory. Local counterpart to track-lint.py (CI)
 
    **Consistency:** correct status directory, filename pattern, no duplicate IDs, deps exist, no self-refs, no cycles, active/review/done deps must be done.
 
-4. Check `.track/claims/`: refs exist, expired warnings, scope overlap.
+4. Check `.track/tasks/claims/`: refs exist, expired warnings, scope overlap.
 5. Report all issues with severity.
 
 ## Response

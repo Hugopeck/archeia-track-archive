@@ -15,17 +15,20 @@ Most product logic lives in markdown skill files, Archeia templates, and Track p
 - `.claude/skills/archeia-ask/SKILL.md` — Archeia query skill
 - `.claude/skills/track-*/SKILL.md` — Track coordination skills
 - `.claude/skills/archeia/templates/` — Archeia's canonical template set
+- `docs/ONTOLOGY.md` — shared ontology and source-of-truth hierarchy
 - `plugins/archeia/` — Claude Code plugin distribution for `/archeia:init` and `/archeia:ask`
 - `plugins/track/` — Claude Code plugin distribution for `/track:*`
 - `skills/` — skills.sh / Codex / Cursor distributions
 - `.track/PROTOCOL.md` — source of truth for Track's task format and coordination rules
+- `.track/projects/` — Track project briefs for active projects
 - `tools/track-lint.py` — deterministic Track validator used in CI
 - `scripts/sync-skills.sh` — syncs canonical skills to both distribution targets
 - `.releaserc.json` — semantic-release configuration for versioning and GitHub releases
 - `.github/workflows/ci.yml` — sync check + Track validation
 - `.github/workflows/release.yml` — release automation on pushes to `main`
 - `.archeia/` — Archeia's own product documentation (self-referential)
-- `TODO.md` — current development priorities
+- `.archeia/PROTOCOL.md` — Archeia protocol for document families and maintenance modes
+- `TODO.md` — pointer to the operational backlog in `.track/`
 
 ## Workflow
 

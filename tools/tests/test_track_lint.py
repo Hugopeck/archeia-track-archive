@@ -31,14 +31,20 @@ spec.loader.exec_module(track_lint)
 
 def make_config(scopes=None, projects=None):
     """Create a minimal valid config dict."""
+    projects = projects or {}
+    active_numeric_keys = []
+    for key, info in projects.items():
+        if str(key).isdigit() and isinstance(info, dict) and info.get("status") == "active":
+            active_numeric_keys.append(int(key))
+
     config = {
         "schema_version": "0.1",
         "statuses": ["triage", "todo", "active", "review", "done", "cancelled"],
         "priorities": ["urgent", "high", "medium", "low"],
         "types": ["bug", "feature", "improvement", "debt", "infra", "spike"],
         "scopes": scopes or [],
-        "projects": projects or {},
-        "id_counter": 10,
+        "projects": projects,
+        "project_counter": (max(active_numeric_keys) + 1) if active_numeric_keys else 1,
     }
     return config
 
@@ -46,12 +52,13 @@ def make_config(scopes=None, projects=None):
 def make_task_content(fm_overrides=None, body=None):
     """Create a valid task file content string."""
     fm = {
-        "id": '"001"',
+        "id": '"1.1"',
         "title": '"[Implement] Sample task"',
         "status": "triage",
         "mode": "implement",
         "priority": "high",
         "type": "feature",
+        "project": '"1"',
         "created": "2026-03-01",
         "updated": "2026-03-10",
         "depends_on": "[]",
@@ -95,13 +102,14 @@ Root cause analysis here.
     return f"---\n{fm_lines}\n---\n{body}"
 
 
-def setup_track_dir(tasks=None, config=None, claims=None):
+def setup_track_dir(tasks=None, config=None, claims=None, briefs=None):
     """Create a temporary .track/ directory with tasks."""
     tmpdir = tempfile.mkdtemp()
     track_dir = Path(tmpdir) / ".track"
 
     for status in ["triage", "todo", "active", "review", "done", "cancelled", "claims"]:
-        (track_dir / status).mkdir(parents=True, exist_ok=True)
+        (track_dir / "tasks" / status).mkdir(parents=True, exist_ok=True)
+    (track_dir / "projects").mkdir(parents=True, exist_ok=True)
 
     # Write config
     import yaml
@@ -112,14 +120,25 @@ def setup_track_dir(tasks=None, config=None, claims=None):
     # Write tasks
     if tasks:
         for path, content in tasks.items():
-            filepath = track_dir / path
+            task_path = Path(path)
+            if task_path.parts and task_path.parts[0] != "tasks":
+                filepath = track_dir / "tasks" / task_path
+            else:
+                filepath = track_dir / task_path
             filepath.parent.mkdir(parents=True, exist_ok=True)
             filepath.write_text(content)
 
     # Write claims
     if claims:
         for path, content in claims.items():
-            filepath = track_dir / "claims" / path
+            filepath = track_dir / "tasks" / "claims" / path
+            filepath.write_text(content)
+
+    # Write project briefs
+    if briefs:
+        for path, content in briefs.items():
+            filepath = track_dir / path
+            filepath.parent.mkdir(parents=True, exist_ok=True)
             filepath.write_text(content)
 
     return track_dir, tmpdir
@@ -229,11 +248,170 @@ class TestSchemaValidation:
         assert has_issue_containing(issues, "project 'missing-project'")
 
     def test_accepts_known_project(self):
-        fm = {"id": "001", "status": "triage", "priority": "high",
-              "type": "feature", "project": "api-v2", "depends_on": []}
-        config = make_config(projects={"api-v2": {"title": "API v2"}})
+        fm = {"id": "1.1", "status": "triage", "priority": "high",
+              "type": "feature", "project": "1", "depends_on": []}
+        config = make_config(projects={"1": {
+            "title": "API v2",
+            "description": "Active project.",
+            "status": "active",
+            "brief": "projects/1-api-v2.md",
+            "task_counter": 2,
+        }})
         issues = track_lint.validate_schema(fm, "", Path("test.md"), config)
         assert not has_issue_containing(issues, "project")
+
+    def test_open_task_cannot_reference_archived_project(self):
+        fm = {"id": "001", "status": "todo", "priority": "high",
+              "type": "feature", "project": "legacy", "depends_on": []}
+        config = make_config(projects={
+            "legacy": {
+                "title": "Legacy",
+                "description": "Historical project.",
+                "status": "archived",
+            }
+        })
+        issues = track_lint.validate_schema(fm, "", Path("test.md"), config)
+        assert has_issue_containing(issues, "archived project 'legacy'")
+
+    def test_done_task_can_reference_archived_project(self):
+        fm = {"id": "001", "status": "done", "priority": "high",
+              "type": "feature", "project": "legacy", "depends_on": []}
+        config = make_config(projects={
+            "legacy": {
+                "title": "Legacy",
+                "description": "Historical project.",
+                "status": "archived",
+            }
+        })
+        issues = track_lint.validate_schema(fm, "", Path("test.md"), config)
+        assert not has_issue_containing(issues, "archived project")
+
+    def test_dotted_id_must_match_project(self):
+        fm = {"id": "4.2", "status": "todo", "priority": "high",
+              "type": "feature", "project": "3", "depends_on": []}
+        config = make_config(projects={
+            "3": {
+                "title": "Query",
+                "description": "Ship query path.",
+                "status": "active",
+                "brief": "projects/3-query.md",
+                "task_counter": 3,
+            }
+        })
+        issues = track_lint.validate_schema(fm, "", Path("test.md"), config)
+        assert has_issue_containing(issues, "must match project '3'")
+
+    def test_open_task_rejects_legacy_id(self):
+        fm = {"id": "042", "status": "triage", "priority": "high",
+              "type": "feature", "project": "4", "depends_on": []}
+        config = make_config(projects={
+            "4": {
+                "title": "Launch",
+                "description": "Finish launch.",
+                "status": "active",
+                "brief": "projects/4-launch.md",
+                "task_counter": 7,
+            }
+        })
+        issues = track_lint.validate_schema(fm, "", Path("test.md"), config)
+        assert has_issue_containing(issues, "open tasks must use dotted")
+
+
+# ---------------------------------------------------------------------------
+# Project registry validation tests
+# ---------------------------------------------------------------------------
+
+class TestProjectRegistryValidation:
+
+    def test_active_project_requires_brief(self):
+        track_dir, tmpdir = setup_track_dir(config=make_config(projects={
+            "governance": {
+                "title": "Governance",
+                "description": "Define repo governance.",
+                "status": "active",
+                "task_counter": 1,
+            }
+        }))
+        try:
+            config, _ = track_lint.load_config(track_dir)
+            issues = track_lint.validate_project_registry(config, track_dir)
+            assert has_issue_containing(issues, "active project 'governance' must define brief")
+        finally:
+            teardown(tmpdir)
+
+    def test_missing_brief_path_fails(self):
+        track_dir, tmpdir = setup_track_dir(config=make_config(projects={
+            "1": {
+                "title": "Governance",
+                "description": "Define repo governance.",
+                "status": "active",
+                "brief": "projects/1-governance.md",
+                "task_counter": 1,
+            }
+        }))
+        try:
+            config, _ = track_lint.load_config(track_dir)
+            issues = track_lint.validate_project_registry(config, track_dir)
+            assert has_issue_containing(issues, "brief file does not exist")
+        finally:
+            teardown(tmpdir)
+
+    def test_brief_h1_must_match_title(self):
+        brief = "# Wrong Title\n\n## Goal\n\n## Why Now\n\n## In Scope\n\n## Out Of Scope\n\n## Shared Context\n\n## Dependency Notes\n\n## Success Definition\n\n## Candidate Task Seeds\n"
+        track_dir, tmpdir = setup_track_dir(
+            config=make_config(projects={
+                "1": {
+                    "title": "Governance",
+                    "description": "Define repo governance.",
+                    "status": "active",
+                    "brief": "projects/1-governance.md",
+                    "task_counter": 1,
+                }
+            }),
+            briefs={"projects/1-governance.md": brief},
+        )
+        try:
+            config, _ = track_lint.load_config(track_dir)
+            issues = track_lint.validate_project_registry(config, track_dir)
+            assert has_issue_containing(issues, "H1 must match config title 'Governance'")
+        finally:
+            teardown(tmpdir)
+
+    def test_brief_requires_all_sections(self):
+        brief = "# Governance\n\n## Goal\n\n## Why Now\n\n## In Scope\n"
+        track_dir, tmpdir = setup_track_dir(
+            config=make_config(projects={
+                "1": {
+                    "title": "Governance",
+                    "description": "Define repo governance.",
+                    "status": "active",
+                    "brief": "projects/1-governance.md",
+                    "task_counter": 1,
+                }
+            }),
+            briefs={"projects/1-governance.md": brief},
+        )
+        try:
+            config, _ = track_lint.load_config(track_dir)
+            issues = track_lint.validate_project_registry(config, track_dir)
+            assert has_issue_containing(issues, "missing required section ## Out Of Scope")
+        finally:
+            teardown(tmpdir)
+
+    def test_archived_project_without_brief_is_valid(self):
+        track_dir, tmpdir = setup_track_dir(config=make_config(projects={
+            "legacy": {
+                "title": "Legacy",
+                "description": "Historical project.",
+                "status": "archived",
+            }
+        }))
+        try:
+            config, _ = track_lint.load_config(track_dir)
+            issues = track_lint.validate_project_registry(config, track_dir)
+            assert len(get_errors(issues)) == 0
+        finally:
+            teardown(tmpdir)
 
     def test_warns_on_legacy_agent_ready(self):
         fm = {"id": "001", "status": "triage", "priority": "high",
@@ -360,35 +538,35 @@ class TestConsistencyValidation:
 
     def test_detects_status_directory_mismatch(self):
         tasks = [{"fm": {"id": "001", "status": "todo", "depends_on": []},
-                  "body": "", "path": Path(".track/active/001-test.md"),
+                  "body": "", "path": Path(".track/tasks/active/001-test.md"),
                   "rel_path": "active/001-test.md"}]
         issues = track_lint.validate_consistency(tasks, Path(".track"))
         assert has_issue_containing(issues, "directory mismatch")
 
     def test_detects_bad_filename(self):
         tasks = [{"fm": {"id": "001", "status": "todo", "depends_on": []},
-                  "body": "", "path": Path(".track/todo/001-Bad_Slug.md"),
+                  "body": "", "path": Path(".track/tasks/todo/001-Bad_Slug.md"),
                   "rel_path": "todo/001-Bad_Slug.md"}]
         issues = track_lint.validate_consistency(tasks, Path(".track"))
         assert has_issue_containing(issues, "filename must match")
 
     def test_accepts_good_filename(self):
         tasks = [{"fm": {"id": "001", "status": "todo", "depends_on": []},
-                  "body": "", "path": Path(".track/todo/001-good-slug.md"),
+                  "body": "", "path": Path(".track/tasks/todo/001-good-slug.md"),
                   "rel_path": "todo/001-good-slug.md"}]
         issues = track_lint.validate_consistency(tasks, Path(".track"))
         assert not has_issue_containing(issues, "filename must match")
 
     def test_detects_missing_dependency(self):
         tasks = [{"fm": {"id": "001", "status": "triage", "depends_on": ["999"]},
-                  "body": "", "path": Path(".track/triage/001-test.md"),
+                  "body": "", "path": Path(".track/tasks/triage/001-test.md"),
                   "rel_path": "triage/001-test.md"}]
         issues = track_lint.validate_consistency(tasks, Path(".track"))
         assert has_issue_containing(issues, "missing task '999'")
 
     def test_detects_self_reference(self):
         tasks = [{"fm": {"id": "001", "status": "triage", "depends_on": ["001"]},
-                  "body": "", "path": Path(".track/triage/001-test.md"),
+                  "body": "", "path": Path(".track/tasks/triage/001-test.md"),
                   "rel_path": "triage/001-test.md"}]
         issues = track_lint.validate_consistency(tasks, Path(".track"))
         assert has_issue_containing(issues, "may not reference task itself")
@@ -396,10 +574,10 @@ class TestConsistencyValidation:
     def test_detects_duplicate_ids(self):
         tasks = [
             {"fm": {"id": "001", "status": "todo", "depends_on": []},
-             "body": "", "path": Path(".track/todo/001-first.md"),
+             "body": "", "path": Path(".track/tasks/todo/001-first.md"),
              "rel_path": "todo/001-first.md"},
             {"fm": {"id": "001", "status": "triage", "depends_on": []},
-             "body": "", "path": Path(".track/triage/001-second.md"),
+             "body": "", "path": Path(".track/tasks/triage/001-second.md"),
              "rel_path": "triage/001-second.md"},
         ]
         issues = track_lint.validate_consistency(tasks, Path(".track"))
@@ -408,10 +586,10 @@ class TestConsistencyValidation:
     def test_detects_simple_cycle(self):
         tasks = [
             {"fm": {"id": "001", "status": "triage", "depends_on": ["002"]},
-             "body": "", "path": Path(".track/triage/001-a.md"),
+             "body": "", "path": Path(".track/tasks/triage/001-a.md"),
              "rel_path": "triage/001-a.md"},
             {"fm": {"id": "002", "status": "triage", "depends_on": ["001"]},
-             "body": "", "path": Path(".track/triage/002-b.md"),
+             "body": "", "path": Path(".track/tasks/triage/002-b.md"),
              "rel_path": "triage/002-b.md"},
         ]
         issues = track_lint.validate_consistency(tasks, Path(".track"))
@@ -420,13 +598,13 @@ class TestConsistencyValidation:
     def test_detects_three_node_cycle(self):
         tasks = [
             {"fm": {"id": "001", "status": "triage", "depends_on": ["002"]},
-             "body": "", "path": Path(".track/triage/001-a.md"),
+             "body": "", "path": Path(".track/tasks/triage/001-a.md"),
              "rel_path": "triage/001-a.md"},
             {"fm": {"id": "002", "status": "triage", "depends_on": ["003"]},
-             "body": "", "path": Path(".track/triage/002-b.md"),
+             "body": "", "path": Path(".track/tasks/triage/002-b.md"),
              "rel_path": "triage/002-b.md"},
             {"fm": {"id": "003", "status": "triage", "depends_on": ["001"]},
-             "body": "", "path": Path(".track/triage/003-c.md"),
+             "body": "", "path": Path(".track/tasks/triage/003-c.md"),
              "rel_path": "triage/003-c.md"},
         ]
         issues = track_lint.validate_consistency(tasks, Path(".track"))
@@ -435,13 +613,13 @@ class TestConsistencyValidation:
     def test_no_cycle_in_dag(self):
         tasks = [
             {"fm": {"id": "001", "status": "triage", "depends_on": []},
-             "body": "", "path": Path(".track/triage/001-a.md"),
+             "body": "", "path": Path(".track/tasks/triage/001-a.md"),
              "rel_path": "triage/001-a.md"},
             {"fm": {"id": "002", "status": "triage", "depends_on": ["001"]},
-             "body": "", "path": Path(".track/triage/002-b.md"),
+             "body": "", "path": Path(".track/tasks/triage/002-b.md"),
              "rel_path": "triage/002-b.md"},
             {"fm": {"id": "003", "status": "triage", "depends_on": ["001", "002"]},
-             "body": "", "path": Path(".track/triage/003-c.md"),
+             "body": "", "path": Path(".track/tasks/triage/003-c.md"),
              "rel_path": "triage/003-c.md"},
         ]
         issues = track_lint.validate_consistency(tasks, Path(".track"))
@@ -450,10 +628,10 @@ class TestConsistencyValidation:
     def test_active_task_requires_done_blockers(self):
         tasks = [
             {"fm": {"id": "001", "status": "todo", "depends_on": []},
-             "body": "", "path": Path(".track/todo/001-a.md"),
+             "body": "", "path": Path(".track/tasks/todo/001-a.md"),
              "rel_path": "todo/001-a.md"},
             {"fm": {"id": "002", "status": "active", "depends_on": ["001"]},
-             "body": "", "path": Path(".track/active/002-b.md"),
+             "body": "", "path": Path(".track/tasks/active/002-b.md"),
              "rel_path": "active/002-b.md"},
         ]
         issues = track_lint.validate_consistency(tasks, Path(".track"))
@@ -552,16 +730,29 @@ class TestIntegration:
 
     def test_valid_task_passes(self):
         content = make_task_content()
+        config = make_config(projects={
+            "1": {
+                "title": "Project One",
+                "description": "A valid active project.",
+                "status": "active",
+                "brief": "projects/1-project-one.md",
+                "task_counter": 2,
+            }
+        })
         track_dir, tmpdir = setup_track_dir(
-            tasks={"triage/001-sample.md": content}
+            tasks={"triage/1.1-sample.md": content},
+            config=config,
+            briefs={
+                "projects/1-project-one.md": "# Project One\n\n## Goal\n\n## Why Now\n\n## In Scope\n\n## Out Of Scope\n\n## Shared Context\n\n## Dependency Notes\n\n## Success Definition\n\n## Candidate Task Seeds\n"
+            },
         )
         try:
             tasks, parse_issues = track_lint.discover_tasks(track_dir)
             assert len(tasks) == 1
             assert len(parse_issues) == 0
 
-            config = make_config()
             all_issues = []
+            all_issues.extend(track_lint.validate_project_registry(config, track_dir))
             for t in tasks:
                 all_issues.extend(track_lint.validate_schema(t["fm"], t["body"], t["path"], config))
                 all_issues.extend(track_lint.validate_structure(t["fm"], t["body"], t["path"]))
@@ -573,14 +764,35 @@ class TestIntegration:
             teardown(tmpdir)
 
     def test_invalid_frontmatter_fails(self):
-        content = "---\nid: 001\n---\n## Context\n"
+        content = "---\nid: 1.1\nproject: '1'\n---\n## Context\n"
         track_dir, tmpdir = setup_track_dir(
-            tasks={"triage/001-bad.md": content}
+            tasks={"triage/1.1-bad.md": content},
+            config=make_config(projects={
+                "1": {
+                    "title": "Project One",
+                    "description": "A valid active project.",
+                    "status": "active",
+                    "brief": "projects/1-project-one.md",
+                    "task_counter": 2,
+                }
+            }),
+            briefs={
+                "projects/1-project-one.md": "# Project One\n\n## Goal\n\n## Why Now\n\n## In Scope\n\n## Out Of Scope\n\n## Shared Context\n\n## Dependency Notes\n\n## Success Definition\n\n## Candidate Task Seeds\n"
+            },
         )
         try:
             tasks, parse_issues = track_lint.discover_tasks(track_dir)
-            config = make_config()
+            config = make_config(projects={
+                "1": {
+                    "title": "Project One",
+                    "description": "A valid active project.",
+                    "status": "active",
+                    "brief": "projects/1-project-one.md",
+                    "task_counter": 2,
+                }
+            })
             all_issues = list(parse_issues)
+            all_issues.extend(track_lint.validate_project_registry(config, track_dir))
             for t in tasks:
                 all_issues.extend(track_lint.validate_schema(t["fm"], t["body"], t["path"], config))
                 all_issues.extend(track_lint.validate_structure(t["fm"], t["body"], t["path"]))
@@ -602,6 +814,7 @@ class TestIntegration:
         assert len(parse_issues) == 0, f"Parse issues: {parse_issues}"
 
         all_issues = []
+        all_issues.extend(track_lint.validate_project_registry(config, track_dir))
         for t in tasks:
             all_issues.extend(track_lint.validate_schema(t["fm"], t["body"], t["path"], config))
             all_issues.extend(track_lint.validate_structure(t["fm"], t["body"], t["path"]))
@@ -645,6 +858,7 @@ def run_tests():
     test_classes = [
         TestSchemaValidation,
         TestStructureValidation,
+        TestProjectRegistryValidation,
         TestConsistencyValidation,
         TestClaimValidation,
         TestGlobOverlap,

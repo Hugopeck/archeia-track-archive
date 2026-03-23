@@ -32,9 +32,12 @@ Plugin commands:
 Track keeps multi-agent coordination inside the repository:
 
 - `.track/PROTOCOL.md` — task and claim protocol
-- `.track/config.yaml` — schema vocabulary and ID counter
-- `.track/{triage,todo,active,review,done,cancelled}/` — task states
-- `.track/claims/` — advisory task claims
+- `.track/config.yaml` — schema vocabulary, project registry, and counters
+- `.track/projects/` — project briefs for active initiatives
+- `.track/projects/README.md` — project brief conventions and required sections
+- `.track/tasks/{triage,todo,active,review,done,cancelled}/` — task states
+- `.track/tasks/claims/` — advisory task claims
+- `.track/tasks/README.md` — task-state and claim-layout overview
 
 Plugin commands:
 
@@ -70,6 +73,8 @@ Use the generated `skills/` directories with tools that consume the Agent Skills
 ## Development
 
 - Canonical source lives in `.claude/skills/`
+- Shared definitions live in `docs/ONTOLOGY.md`
+- Archeia protocol lives in `.archeia/PROTOCOL.md`
 - Sync generated distributions with `bash scripts/sync-skills.sh`
 - Verify generated copies with `bash scripts/sync-skills.sh --check`
 - Validate Track dogfooding with `python3 tools/track-lint.py`
@@ -83,8 +88,10 @@ Use the generated `skills/` directories with tools that consume the Agent Skills
 - `skills/` — skills.sh / Codex / Cursor distributions
 - `scripts/` — maintenance scripts
 - `tools/` — deterministic validation tooling
+- `docs/ONTOLOGY.md` — shared ontology and source-of-truth hierarchy
 - `.claude/skills/` — canonical skill sources
 - `.track/` — Track dogfooding workspace
+- `.track/projects/` — Track project briefs
 - `.archeia/` — Archeia's own product docs
 
 ## License
