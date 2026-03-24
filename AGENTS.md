@@ -5,45 +5,37 @@
 This repo is the Archeia monorepo. It contains two markdown-first products:
 
 - **Archeia** — architecture knowledge generation and query skills
-- **Track** — file-based multi-agent task coordination skills
+- **Track** — git-native task coordination via `CLAUDE.md`, `.track/`, and Bash scripts
 
-The product surface is local skill packs, templates, protocol docs, and a small amount of maintenance tooling. There is no app server, no SaaS backend, and no compiled product runtime.
+There is no app server, no SaaS backend, and no compiled product runtime.
 
 ## Repository Structure
 
-```
-.claude/skills/               <- Canonical source for all skills
+```text
+.claude/skills/               <- Canonical Archeia skill sources
   archeia/                    <- /archeia write path + templates
   archeia-ask/                <- /archeia-ask read path
-  track-*/                    <- Track coordination skills
 plugins/                      <- Claude Code plugin distributions
   archeia/                    <- /archeia:init and /archeia:ask
-  track/                      <- /track:* commands
 skills/                       <- skills.sh / Codex / Cursor distributions
-scripts/                      <- Maintenance scripts (skill sync, commit checks)
-tools/                        <- Deterministic validation and board tooling
-PROJECTS.md                   <- Gitignored root portfolio view derived from Track state
-TASKS.md                      <- Gitignored root task index derived from Track state
-BOARD.md                      <- Gitignored root kanban view derived from Track state
-.track/                       <- Track protocol + dogfooding workspace
-  config.yaml                 <- Track registry for vocabularies, projects, and counters
-  projects/                   <- Track project briefs for active initiatives
-    README.md                 <- Project brief contract and required sections
-  tasks/                      <- Track task states and claims
-    README.md                 <- Task/claim layout and ID conventions
+scripts/                      <- Maintenance scripts and Track helpers
+.track/
+  projects/                   <- Track project briefs
+    README.md                 <- Project brief contract
+  tasks/                      <- Flat Track task files
 .archeia/                     <- Archeia's own product docs
+CLAUDE.md                     <- Always-on repo and Track workflow guide
+TODO.md                       <- Generated, gitignored Track view
 docs/ONTOLOGY.md              <- Shared ontology + authority hierarchy
-docs/designs/                 <- Strategic design documents
 ```
 
 ## Key Boundaries
 
-- **Canonical source is `.claude/skills/`** — edit canonical skills first, then sync distributions
-- **Skills are markdown-first** — product behavior lives in `SKILL.md`, templates, and `.track/PROTOCOL.md`
-- **Protocols own durable contracts** — shared terms live in `docs/ONTOLOGY.md`, Track rules in `.track/PROTOCOL.md`, Archeia rules in `.archeia/PROTOCOL.md`
-- **Registry and briefs have separate jobs** — `.track/config.yaml` owns Track vocabulary, project membership, and counters; `.track/projects/*.md` owns narrative scope and success definition
-- **Track protocol is strict** — do not silently widen schema, status vocabulary, or claim rules
-- **Maintenance tooling is local** — `scripts/sync-skills.sh`, `tools/track-lint.py`, and `tools/track-build.py` keep distributions and local Track views honest
+- **Canonical Archeia source is `.claude/skills/`** — edit canonical skills first, then sync distributions
+- **Track is instruction-first** — the durable coordination contract lives in `CLAUDE.md`, `.track/projects/*.md`, and `.track/tasks/*.md`
+- **Track in-flight state is git-native** — default-branch task files own backlog state; open GitHub PRs own effective `active` / `review`
+- **`TODO.md` is derived** — regenerate it with `bash scripts/track-todo.sh`; never treat it as canonical
+- **Validation is local-first Bash** — `scripts/track-validate.sh` is the enforcement layer for Track state
 - **`.archeia/` is self-referential** — it documents this repo's own product architecture
 
 ## Working in This Repo
@@ -55,22 +47,20 @@ When modifying Archeia:
 4. Update `.archeia/` docs when Archeia's product direction, layout, or maintenance flow changes
 
 When modifying Track:
-1. Read `.track/PROTOCOL.md` and `docs/ONTOLOGY.md` before changing task schema, validation rules, or skill behavior
-2. Edit `.claude/skills/track-*/` directly
-3. Treat `.track/config.yaml` as the machine-readable registry and `.track/projects/*.md` as the narrative scope contract
-4. Keep `tools/track-lint.py`, `tools/track-build.py`, `.track/PROTOCOL.md`, `.track/tasks/README.md`, and `.track/projects/README.md` aligned in the same change when rules move
-5. Refresh local derived views with `bash scripts/track-build.sh` after Track state changes or skill updates that affect the board
-6. Run `python3 tools/track-lint.py`, `python3 tools/tests/test_track_lint.py`, and `python3 tools/tests/test_track_build.py` when Track rules or tooling change
+1. Read `CLAUDE.md` and `docs/ONTOLOGY.md` before changing task schema, task lifecycle, or generator behavior
+2. Edit `.track/projects/*.md` for scope and `.track/tasks/*.md` for work items
+3. Keep `scripts/track-validate.sh`, `scripts/track-todo.sh`, `CLAUDE.md`, and `.track/projects/README.md` aligned in the same change when rules move
+4. Refresh the derived view with `bash scripts/track-todo.sh` after Track state changes
+5. Run `bash scripts/track-validate.sh` when Track rules or task files change
 
 When modifying distributions:
-1. Do not hand-edit generated copies in `plugins/*/skills/` or `skills/*/` unless you are fixing the sync process itself
+1. Do not hand-edit generated copies in `plugins/archeia/` or `skills/archeia-*` unless you are fixing the sync process itself
 2. Run `bash scripts/sync-skills.sh --check` before landing distribution-related changes
 
 ## What Not to Do
 
 - Do not add a CLI, daemon, or cloud service
-- Do not edit generated skill copies instead of the canonical source
-- Do not silently widen Track's schema, statuses, priorities, types, or modes
-- Do not reintroduce legacy flat `.track/{status}/` task paths or `.track/claims/` claim paths
-- Do not hand-edit `PROJECTS.md`, `TASKS.md`, `BOARD.md`, or `.track/index.json`; rebuild them from canonical Track state
+- Do not edit generated Archeia copies instead of the canonical source
+- Do not reintroduce `.track/config.yaml`, `.track/PROTOCOL.md`, claims, status subdirectories, or Python Track tooling
+- Do not hand-edit `TODO.md`; regenerate it from canonical Track state
 - Do not modify `.archeia/` docs casually — they describe the repo's actual product architecture

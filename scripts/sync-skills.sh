@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# sync-skills.sh — Sync canonical skills to plugin and skills.sh distributions.
+# sync-skills.sh — Sync canonical Archeia skills to plugin and standalone distributions.
 # Canonical source: .claude/skills/
-# Targets: plugins/*/skills/, skills/*/
+# Targets: plugins/archeia/skills/, skills/archeia-*/
 #
 # Usage:
 #   bash scripts/sync-skills.sh
@@ -112,19 +112,6 @@ sync_mapping \
   "archeia:ask" \
   "skills/archeia-ask" \
   "archeia-ask"
-
-for source_dir in "$REPO_ROOT"/.claude/skills/track-*; do
-  [[ -d "$source_dir" ]] || continue
-  skill_slug="$(basename "$source_dir")"
-  command_name="${skill_slug#track-}"
-
-  sync_mapping \
-    ".claude/skills/$skill_slug" \
-    "plugins/track/skills/$command_name" \
-    "track:$command_name" \
-    "skills/$skill_slug" \
-    "$skill_slug"
-done
 
 if [[ $CHECK_MODE -eq 1 ]]; then
   exit "$STATUS"

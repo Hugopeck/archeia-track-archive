@@ -8,21 +8,15 @@ on:
 jobs:
   repo-checks:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          fetch-depth: 0
 
-      - name: Install lint dependencies
-        run: pip install pyyaml
-
-      - name: Verify skill distributions are synced
+      - name: Verify Archeia skill distributions are synced
         run: bash scripts/sync-skills.sh --check
 
-      - name: Validate .track files
-        run: python3 tools/track-lint.py
-
-      - name: Run Track lint tests
-        run: python3 tools/tests/test_track_lint.py
+      - name: Validate Track state
+        run: bash scripts/track-validate.sh

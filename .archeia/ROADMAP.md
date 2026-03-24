@@ -1,7 +1,6 @@
 # Roadmap
 
-Operational work items live in `.track/`. This document covers strategic
-direction, product shape, and historical mapping only.
+Operational work items live in `.track/`, with `TODO.md` generated from task files and live PR state. This document covers strategic direction, product shape, and historical mapping only.
 
 ## Current Product Shape
 

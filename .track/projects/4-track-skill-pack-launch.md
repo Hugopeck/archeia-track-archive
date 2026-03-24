@@ -1,49 +1,51 @@
-# Track Skill Pack Launch
+# Track Convention Simplification
 
 ## Goal
 
-Finish shipping Track as a pure skill pack with a strict protocol, a deterministic
-validator, and enough dogfooding to trust the operating model.
+Finish simplifying Track into a zero-dependency coordination convention driven by
+`CLAUDE.md`, flat task files, Bash scripts, and provisional PR state.
 
 ## Why Now
 
-Open launch tasks already exist, but they still point at the old
-`launch-readiness` label. This brief gives the project a real scope contract so
-the remaining launch work is easier to reason about and validate.
+The repo no longer needs a Track skill pack, Python validator, or claim system.
+The remaining work is to keep the git-native operating model coherent and easy
+to dogfood.
 
 ## In Scope
 
-- rewrite remaining Track skills for the pure skill pack shape
-- planning and coordination skill coverage
-- validator completion and validation coverage
-- dogfooding the Track operating model with multiple agents
+- `CLAUDE.md` as the always-on Track contract
+- flat `.track/tasks/*.md` files with `project_id`
+- Bash validation and `TODO.md` generation
+- provisional PR lifecycle and post-merge completion writeback
+- dogfooding the simplified operating model in this repo
 
 ## Out Of Scope
 
-- reintroducing the archived Rust CLI
-- widening Track vocabulary or status semantics casually
-- turning Track into a service
+- reintroducing a Track plugin or standalone Track skill pack
+- reintroducing claims, status subdirectories, or Python tooling
+- turning Track into a service or daemon
 
 ## Shared Context
 
-The canonical Track contract is `.track/PROTOCOL.md` plus `tools/track-lint.py`.
-This project is about finishing the operating model, not changing the product
-shape away from markdown-first coordination.
+Track is now a repo convention, not a product runtime. Default-branch task files
+own backlog state. Open GitHub PRs own effective in-flight state. `TODO.md` is a
+derived view.
 
 ## Dependency Notes
 
-Governance work upgrades the project model that this launch work now uses.
-Launch validation should continue to reference archived launch work for history
-without reopening those archived projects.
+Governance work still defines source-of-truth boundaries. Any follow-on Track
+work should preserve the zero-dependency, git-native direction established by
+this simplification.
 
 ## Success Definition
 
-- remaining launch tasks validate against the new project registry
-- Track skills and validator agree on the same protocol
-- dogfooding produces enough evidence to trust the launch path
+- the repo can validate Track state with Bash only
+- `TODO.md` accurately reflects default-branch tasks plus open PR overlays
+- task ownership is visible from provisional PRs without a claim system
+- agents can follow Track purely from `CLAUDE.md` and `.track/`
 
 ## Candidate Task Seeds
 
-- complete tasks 4.1–4.6 under the new project key
-- add any missing project-aware planning behavior
-- capture launch readiness evidence and unresolved risks
+- dogfood the provisional PR workflow across a few real tasks
+- tighten TODO generation if overlap heuristics prove too loose
+- add bootstrap snippets for other repos that want the same convention

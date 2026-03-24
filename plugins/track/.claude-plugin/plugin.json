@@ -1,8 +1,0 @@
-{
-  "name": "track",
-  "description": "File-based multi-agent task coordination. Create, claim, move, and query tasks stored as markdown in .track/.",
-  "homepage": "https://github.com/Hugopeck/archeia",
-  "author": {
-    "name": "Hugo Peck"
-  }
-}

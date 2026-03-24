@@ -3,8 +3,8 @@
 ## Goal
 
 Define the durable governance stack for the repo so that shared definitions,
-product protocols, executable contracts, strategy docs, and operational work
-surfaces each have a clear owner.
+always-on instructions, executable contracts, strategy docs, and operational
+work surfaces each have a clear owner.
 
 ## Why Now
 
@@ -16,7 +16,7 @@ project consolidates authority before more work lands on top of the old overlap.
 
 - shared ontology and source-of-truth hierarchy
 - Archeia protocol definition
-- Track project registry and project brief contract
+- Track project brief and flat task-file contract
 - backlog surface migration from pointer docs into `.track/`
 - cross-linking the governance model through top-level repo docs
 
@@ -28,9 +28,9 @@ project consolidates authority before more work lands on top of the old overlap.
 
 ## Shared Context
 
-`docs/ONTOLOGY.md` is the shared vocabulary. `.track/PROTOCOL.md` and
-`.archeia/PROTOCOL.md` own product-specific rules. `TODO.md` is now a pointer,
-not a backlog.
+`docs/ONTOLOGY.md` is the shared vocabulary. `CLAUDE.md` is the always-on Track
+contract. `.archeia/PROTOCOL.md` owns Archeia's product-specific rules. `TODO.md`
+is derived and never canonical.
 
 ## Dependency Notes
 
@@ -39,14 +39,13 @@ tooling work should reference these contracts instead of inventing new ones.
 
 ## Success Definition
 
-- every durable artifact family has a named owner and protocol
+- every durable artifact family has a named owner
 - operational work lives in `.track/`
 - strategic direction lives in `.archeia/ROADMAP.md`
-- pointer files no longer duplicate backlog state
+- derived views no longer claim backlog authority
 
 ## Candidate Task Seeds
 
 - audit remaining docs for outdated authority claims
 - refine the governance hierarchy as new artifact families appear
 - define how future generated schema/spec mirrors should be produced
-

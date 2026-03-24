@@ -1,11 +1,11 @@
 # Archeia Monorepo
 
-Local-first skill packs for AI coding agents.
+Local-first guidance and coordination for AI coding agents.
 
-This repo now ships two sibling products:
+This repo ships two sibling products:
 
 - **Archeia** — generates and maintains architecture guidance that agents actually read
-- **Track** — coordinates parallel agent work through repo-local `.track/` task files
+- **Track** — coordinates work through repo-local task files, `CLAUDE.md`, and GitHub PR state
 
 ## Products
 
@@ -29,82 +29,63 @@ Plugin commands:
 
 ### Track
 
-Track keeps multi-agent coordination inside the repository:
+Track is a zero-dependency repo convention:
 
-- `.track/PROTOCOL.md` — task and claim protocol
-- `.track/config.yaml` — schema vocabulary, project registry, and counters
-- `.track/projects/` — project briefs for active initiatives
-- `.track/projects/README.md` — project brief conventions and required sections
-- `.track/tasks/{triage,todo,active,review,done,cancelled}/` — task states
-- `.track/tasks/claims/` — advisory task claims
-- `.track/tasks/README.md` — task-state and claim-layout overview
-- `PROJECTS.md` — gitignored root portfolio view generated from Track state
-- `TASKS.md` — gitignored root task index generated from Track state
-- `BOARD.md` — gitignored root kanban generated from Track state
+- `CLAUDE.md` — always-on task coordination instructions
+- `.track/projects/*.md` — project briefs
+- `.track/tasks/*.md` — flat task files
+- `scripts/track-validate.sh` — Bash validation
+- `scripts/track-todo.sh` — shared `TODO.md` generation
+- `TODO.md` — generated view from default-branch `.track/` plus live open PR metadata
 
-Plugin commands:
-
-- `/track:init`, `/track:new`, `/track:move`, `/track:show`, `/track:list`
-- `/track:board`, `/track:stats`, `/track:claim`, `/track:release`
-- `/track:available`, `/track:validate`, `/track:decompose`, `/track:plan`
+Track does not ship a plugin, daemon, claim system, or Python runtime.
 
 ## Install
 
-### Claude Code plugins
+### Claude Code plugin
 
-Run either plugin locally during development and testing:
+Run the Archeia plugin locally during development and testing:
 
 ```shell
 claude --plugin-dir ./plugins/archeia
-claude --plugin-dir ./plugins/track
 ```
 
 ### Canonical Claude skills
 
-Copy the canonical skill directories from `.claude/skills/` into your repo's `.claude/skills/` directory.
+Copy the canonical Archeia skill directories from `.claude/skills/` into your repo's `.claude/skills/` directory.
 
-- Archeia: `.claude/skills/archeia/`, `.claude/skills/archeia-ask/`
-- Track: `.claude/skills/track-*/`
-
-Shared Conductor workspaces can also use the committed `conductor.json` to prebuild the local Track views on setup and run a watcher from the Run button.
+- `.claude/skills/archeia/`
+- `.claude/skills/archeia-ask/`
 
 ### skills.sh / Codex / Cursor distribution
 
 Use the generated `skills/` directories with tools that consume the Agent Skills format.
 
-- Archeia: `skills/archeia-init/`, `skills/archeia-ask/`
-- Track: `skills/track-*/`
+- `skills/archeia-init/`
+- `skills/archeia-ask/`
 
 ## Development
 
-- Canonical source lives in `.claude/skills/`
+- Canonical Archeia source lives in `.claude/skills/`
 - Shared definitions live in `docs/ONTOLOGY.md`
 - Archeia protocol lives in `.archeia/PROTOCOL.md`
-- Sync generated distributions with `bash scripts/sync-skills.sh`
+- Sync generated Archeia distributions with `bash scripts/sync-skills.sh`
 - Verify generated copies with `bash scripts/sync-skills.sh --check`
-- Refresh local derived views with `bash scripts/track-build.sh`
-- Conductor `setup` builds `PROJECTS.md`, `TASKS.md`, `BOARD.md`, and `.track/index.json` for each new workspace
-- Conductor `run` launches `bash scripts/track-watch.sh` for live local refresh of all Track views
-- Validate Track dogfooding with `python3 tools/track-lint.py`
-- Run Track validator tests with `python3 tools/tests/test_track_lint.py`
-- Run Track board/index tests with `python3 tools/tests/test_track_build.py`
-
-`tools/track-lint.py` and `tools/track-build.py` require `pyyaml` when run locally.
+- Validate Track state with `bash scripts/track-validate.sh`
+- Regenerate the shared Track view with `bash scripts/track-todo.sh`
+- Conductor `setup` / `run` regenerate `TODO.md` for the workspace
+- `gh` is used opportunistically for live PR overlays in `TODO.md`
 
 ## Layout
 
 - `plugins/` — Claude Code plugin distributions
-- `skills/` — skills.sh / Codex / Cursor distributions
-- `scripts/` — maintenance scripts
-- `tools/` — deterministic validation and derived-view tooling
+- `skills/` — generated standalone Archeia skill distributions
+- `scripts/` — maintenance and Track helper scripts
 - `docs/ONTOLOGY.md` — shared ontology and source-of-truth hierarchy
 - `.claude/skills/` — canonical skill sources
-- `.track/` — Track dogfooding workspace
-- `.track/projects/` — Track project briefs
-- `PROJECTS.md` — gitignored root portfolio view derived from Track state
-- `TASKS.md` — gitignored root task index derived from Track state
-- `BOARD.md` — gitignored root kanban view derived from Track state
+- `.track/` — Track project briefs and task files
 - `.archeia/` — Archeia's own product docs
+- `TODO.md` — generated, gitignored Track view
 
 ## License
 
