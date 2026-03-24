@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/Hugopeck/archeia/compare/v1.3.0...v1.4.0) (2026-03-24)
+
+
+### Features
+
+* **track:** rethink Track as zero-dependency repo convention ([#7](https://github.com/Hugopeck/archeia/issues/7)) ([284d987](https://github.com/Hugopeck/archeia/commit/284d98768b36cf7a67dc835ae483af89458f1ec0))
+
 # [1.3.0](https://github.com/Hugopeck/archeia/compare/v1.2.0...v1.3.0) (2026-03-23)
 
 
