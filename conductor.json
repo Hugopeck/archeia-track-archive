@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "setup": "bash scripts/track-build.sh",
-    "run": "bash scripts/track-watch.sh"
+    "setup": "bash scripts/track-todo.sh || bash scripts/track-todo.sh --offline",
+    "run": "bash scripts/track-todo.sh || bash scripts/track-todo.sh --offline"
   },
   "runScriptMode": "nonconcurrent"
 }

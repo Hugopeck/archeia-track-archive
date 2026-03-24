@@ -12,11 +12,9 @@
 # Conductor
 .context/
 
-# Python
+# Python caches
 __pycache__/
 *.pyc
 
 # Track
-BOARD.md
-PROJECTS.md
-TASKS.md
+TODO.md
