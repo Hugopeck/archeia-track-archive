@@ -15,6 +15,3 @@
 # Python caches
 __pycache__/
 *.pyc
-
-# Track
-TODO.md

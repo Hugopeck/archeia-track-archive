@@ -136,7 +136,7 @@ These are maintenance patterns, not separate products.
 1. Update this protocol when Archeia adds a new durable document family.
 2. Update the relevant template and `SKILL.md` in the same change when template
    structure or generation logic changes.
-3. Keep `.archeia/ROADMAP.md` strategic. Operational work belongs in `.track/`.
+3. Keep `.archeia/ROADMAP.md` strategic.
 4. Do not introduce hand-maintained duplicate schema/spec files for Archeia
    unless tooling consumes them or they are generated mirrors of canonical data.
 

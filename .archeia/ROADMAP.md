@@ -1,6 +1,6 @@
 # Roadmap
 
-Operational work items live in `.track/`, with `TODO.md` generated from task files and live PR state. This document covers strategic direction, product shape, and historical mapping only.
+This document covers strategic direction, product shape, and historical mapping only.
 
 ## Current Product Shape
 
@@ -94,9 +94,9 @@ They are historical references, not the active backlog.
 | F-002 | Official Anthropic marketplace submission | Deferred distribution follow-on; not an active roadmap commitment |
 | F-003 | Standalone skill files alongside plugin | Still part of the supported distribution model |
 | F-004 | `/archeia:init` initializes and updates guidance surfaces | Core write-path capability |
-| F-005 | `/archeia:ask` answers from generated knowledge base | Query-path capability tracked operationally in `.track/` |
+| F-005 | `/archeia:ask` answers from generated knowledge base | Query-path capability ongoing theme |
 | F-006 | Template set for framework docs and colocated README generation | Template-contract evolution theme |
 | F-007 | Doc migration flow that absorbs existing architecture docs | Migration/absorption capability theme |
-| F-008 | GitHub Action template for drift detection | Maintenance automation theme tracked operationally in `.track/` |
-| F-009 | PR template for confirmation flow | Maintenance workflow theme tracked operationally in `.track/` |
-| F-010 | `archeia check` deterministic drift detection | Future deterministic maintenance capability tracked operationally in `.track/` |
+| F-008 | GitHub Action template for drift detection | Maintenance automation theme ongoing theme |
+| F-009 | PR template for confirmation flow | Maintenance workflow theme ongoing theme |
+| F-010 | `archeia check` deterministic drift detection | Future deterministic maintenance capability ongoing theme |
