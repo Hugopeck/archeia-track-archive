@@ -3,6 +3,7 @@
 <!-- DECISION INDEX (agents: scan this first, load full entries as needed)
 | Date       | Domain       | Title                                                          | Status     |
 |------------|--------------|----------------------------------------------------------------|------------|
+| 2026-03-27 | Product      | D-036: Internal evaluation is not a product lane               | Accepted   |
 | 2026-03-23 | Product      | D-035: Instruction architecture before workflow machinery     | Accepted   |
 | 2026-03-22 | Distribution | D-034: Plugin conversion (dual-format)                         | Accepted   |
 | 2026-03-21 | Product      | D-027: Kill the scanner as V0 product                          | Accepted   |
@@ -42,6 +43,36 @@
 
 ---
 
+
+## 2026-03-27 — D-036: Internal evaluation is not a product lane
+
+**Domain:** Product
+**Status:** Accepted
+
+**Context:** The repo accumulated historical exploration work (scanner, CLI, renderer, cloud experiments — ~3,900 lines) and internal evaluation tasks (template determinism measurement, dogfooding exercises) alongside the shipped Archeia product. Task 1.3 asked whether these form a separate "internal evaluation lane" that needs its own boundary rules, or whether existing structures already handle them.
+
+**Decision:** Internal evaluation work is not a product lane. It is ordinary task work that happens to investigate product quality. No separate directory, document family, or governance layer is needed. The existing structure already provides the right homes:
+
+- **Historical learning** (scanner, CLI, experiments) → already documented as context in `.archeia/ROADMAP.md` "What Happened to..." sections and superseded decisions in `DECISIONS.md`. These are reference material, not a lane.
+- **Quality investigation tasks** (template determinism, dogfooding) → ordinary `.track/` tasks with `mode: investigate`. They produce findings that land as decisions, assumption updates, or product changes — not as a parallel output stream.
+- **Product validation artifacts** (if any emerge) → belong in `docs/designs/` as design documents, or as evidence in existing `.archeia/` docs. They do not need a separate evaluation directory.
+
+The key boundary rule: **if a piece of evaluation work produces a durable artifact that agents should read, it must land in an existing document family** (`.archeia/`, `AGENTS.md`, `CLAUDE.md`, `docs/designs/`). If it does not produce a durable artifact, it is a task that completes and closes.
+
+**Assumptions relied on:** A-008 (minimal surface area), A-011 (templates + instructions beat custom pipelines)
+**Constraints respected:** Product shape (single product lane), Ontology (source-of-truth hierarchy)
+
+**Consequences:**
+- No `evaluation/`, `reports/`, or `internal/` directory should be created.
+- Future investigation tasks decompose as `.track/` tasks, not as a parallel product concern.
+- Findings from evaluation work update existing docs (decisions, assumptions, roadmap) rather than creating a new document family.
+- The "What We Learned" section in `ROADMAP.md` remains the right place for historical learning summaries.
+
+**Alternatives considered:**
+- Create a dedicated `docs/evaluations/` directory → rejected because it would create a document family without a clear owner or maintenance path, risking the same drift that `.archeia/` was designed to prevent.
+- Add an "Evaluation" layer to the Protocol → rejected because evaluation is a task mode, not a document layer. Adding it would blur the Layer 1/2/3 model.
+
+---
 
 ## 2026-03-23 — D-035: Instruction architecture before workflow machinery
 
