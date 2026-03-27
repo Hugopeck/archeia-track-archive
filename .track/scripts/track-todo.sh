@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 # shellcheck source=./track-common.sh
-source "$ROOT_DIR/scripts/track-common.sh"
+source "$ROOT_DIR/.track/scripts/track-common.sh"
 
 DEFAULT_BRANCH="${TRACK_DEFAULT_BRANCH:-main}"
 MODE='shared'
@@ -37,7 +37,7 @@ OPEN_PR_STATUSES=()
 
 usage() {
   cat <<'USAGE'
-Usage: bash scripts/track-todo.sh [--local] [--offline] [--output PATH]
+Usage: bash .track/scripts/track-todo.sh [--local] [--offline] [--output PATH]
 
 Default mode reads `.track/` from `origin/main` and overlays live open PR metadata via `gh`.
 USAGE
@@ -106,7 +106,7 @@ load_source_tree() {
   TRACK_TODO_TEMP_DIR="$(mktemp -d)"
   trap 'if [[ -n "${TRACK_TODO_TEMP_DIR:-}" ]]; then rm -rf "$TRACK_TODO_TEMP_DIR"; fi' EXIT
   copy_tree_from_ref "origin/$DEFAULT_BRANCH" "$TRACK_TODO_TEMP_DIR"
-  if ! find "$TRACK_TODO_TEMP_DIR/.track/tasks" -maxdepth 1 -type f -name '''*.md''' | grep -q .; then
+  if ! find "$TRACK_TODO_TEMP_DIR/.track/tasks" -maxdepth 1 -type f -name '*.md' | grep -q .; then
     warn_loud "origin/$DEFAULT_BRANCH has no flat task files in .track/tasks/; falling back to local working tree"
     MODE='local'
     SOURCE_ROOT="$ROOT_DIR"
@@ -155,11 +155,6 @@ load_open_prs() {
 
   if ! command -v gh >/dev/null 2>&1; then
     warn 'gh not found; falling back to offline mode'
-    return 0
-  fi
-
-  if [[ -z "${GH_TOKEN:-${GITHUB_TOKEN:-}}" ]]; then
-    warn 'GH_TOKEN not set; falling back to offline mode'
     return 0
   fi
 
@@ -396,6 +391,7 @@ generate_todo() {
 
     project_sort_lines=''
     for project_id in "${PROJECT_IDS[@]-}"; do
+      [[ -z "$project_id" ]] && continue
       project_sort_lines+="$(project_sort_key "$project_id")"$'\n'
     done
 
@@ -467,6 +463,12 @@ main() {
   done
 
   load_source_tree
+
+  if [[ ! -d "$SOURCE_ROOT/.track/tasks" || ! -d "$SOURCE_ROOT/.track/projects" ]]; then
+    printf 'track: .track/ not found — run /track:init to set up this repo\n' >&2
+    exit 1
+  fi
+
   load_projects
   load_open_prs
   load_tasks
