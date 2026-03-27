@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/Hugopeck/archeia/compare/v1.5.0...v1.6.0) (2026-03-27)
+
+
+### Features
+
+* **track:** add Project 6 — Layer 3 plugin launch scoping ([#11](https://github.com/Hugopeck/archeia/issues/11)) ([c476511](https://github.com/Hugopeck/archeia/commit/c4765111f946e1cee3341e1767a1b336db7f32cc))
+
 # [1.5.0](https://github.com/Hugopeck/archeia/compare/v1.4.0...v1.5.0) (2026-03-27)
 
 
