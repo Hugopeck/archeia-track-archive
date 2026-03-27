@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/Hugopeck/archeia/compare/v1.4.0...v1.5.0) (2026-03-27)
+
+
+### Features
+
+* **track:** move scripts into .track/scripts/ and upgrade to Track 2.1 ([#10](https://github.com/Hugopeck/archeia/issues/10)) ([8254d4b](https://github.com/Hugopeck/archeia/commit/8254d4b52e0a3d6ff41d1edb05cd50de624c622e))
+
 # [1.4.0](https://github.com/Hugopeck/archeia/compare/v1.3.0...v1.4.0) (2026-03-24)
 
 
