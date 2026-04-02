@@ -105,6 +105,9 @@ Append-only log.
 - Otherwise, an open ready-for-review PR for `task/{id}-{slug}` makes the task effectively `review`
 - Otherwise, effective status is `todo`
 
+Repo-local PR expectations live in `.track/specs/pr-instructions.md`.
+Automated changelog PRs are intentionally untracked and use non-`task/` branches.
+
 ### Agent Protocol (primary)
 
 1. Read `TODO.md` for current state. Pick a `todo` task or resume an `active` one.

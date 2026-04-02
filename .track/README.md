@@ -120,6 +120,8 @@ This naming convention is what connects a PR to a task. The scripts parse the br
 
 Bash scripts in `scripts/` enforce Track conventions. See [`scripts/README.md`](scripts/README.md) for a quick reference. These are managed by Track — do not edit them directly.
 
+For repo-local PR expectations, see [`specs/pr-instructions.md`](specs/pr-instructions.md).
+
 ### `track-common.sh` — Shared Library
 
 Not meant to be run directly. Contains helper functions used by the other three scripts:

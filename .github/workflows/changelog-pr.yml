@@ -1,0 +1,178 @@
+name: Changelog PR
+
+on:
+  release:
+    types: [published]
+
+concurrency:
+  group: changelog-${{ github.event.release.tag_name }}
+  cancel-in-progress: false
+
+jobs:
+  changelog-pr:
+    if: ${{ !github.event.release.draft && !github.event.release.prerelease }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      statuses: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RELEASE_TAG: ${{ github.event.release.tag_name }}
+      RELEASE_DATE: ${{ github.event.release.published_at || github.event.release.created_at }}
+      RELEASE_URL: ${{ github.event.release.html_url }}
+      RELEASE_NOTES: ${{ github.event.release.body }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Update changelog entry
+        run: python3 scripts/update-changelog-from-release.py CHANGELOG.md
+
+      - name: Create or update changelog PR
+        id: changelog_pr
+        run: |
+          set -euo pipefail
+
+          safe_tag="$(printf '%s' "$RELEASE_TAG" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9._-]/-/g; s/[.]/-/g')"
+          branch="release/changelog-${safe_tag}"
+          title="docs(changelog): add ${RELEASE_TAG} release notes"
+          body=$(printf '%s\n' \
+            'untracked task' \
+            '' \
+            '## Summary' \
+            "- update CHANGELOG.md for ${RELEASE_TAG}" \
+            '- generated from the published GitHub release notes')
+
+          if git diff --quiet -- CHANGELOG.md; then
+            echo "No changelog changes detected."
+            echo "should_report=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git switch -C "$branch"
+          git add CHANGELOG.md
+          git commit -m "$title"
+          git push --force-with-lease origin "$branch"
+
+          pr_number="$(gh pr list --head "$branch" --base main --state open --json number --jq '.[0].number // empty')"
+          if [[ -n "$pr_number" ]]; then
+            gh pr edit "$pr_number" --title "$title" --body "$body"
+          else
+            gh pr create --base main --head "$branch" --title "$title" --body "$body"
+            pr_number="$(gh pr list --head "$branch" --base main --state open --json number --jq '.[0].number // empty')"
+          fi
+
+          head_sha="$(git rev-parse HEAD)"
+          run_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          {
+            echo "should_report=true"
+            echo "branch=$branch"
+            echo "head_sha=$head_sha"
+            echo "pr_number=$pr_number"
+            echo "title=$title"
+            echo "body<<EOF_BODY"
+            printf '%s\n' "$body"
+            echo "EOF_BODY"
+            echo "run_url=$run_url"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Mark Track Validate pending
+        if: steps.changelog_pr.outputs.should_report == 'true'
+        env:
+          HEAD_SHA: ${{ steps.changelog_pr.outputs.head_sha }}
+          RUN_URL: ${{ steps.changelog_pr.outputs.run_url }}
+        run: |
+          gh api \
+            repos/${{ github.repository }}/statuses/$HEAD_SHA \
+            -f state=pending \
+            -f context='Track Validate' \
+            -f description='Running Track validation for changelog PR' \
+            -f target_url="$RUN_URL" >/dev/null
+
+      - name: Run Track Validate
+        if: steps.changelog_pr.outputs.should_report == 'true'
+        id: track_validate
+        continue-on-error: true
+        env:
+          GITHUB_EVENT_NAME: pull_request
+          GITHUB_HEAD_REF: ${{ steps.changelog_pr.outputs.branch }}
+          PR_TITLE: ${{ steps.changelog_pr.outputs.title }}
+          PR_BODY: ${{ steps.changelog_pr.outputs.body }}
+        run: bash .track/scripts/track-validate.sh
+
+      - name: Mark Track Validate final
+        if: steps.changelog_pr.outputs.should_report == 'true' && always()
+        env:
+          HEAD_SHA: ${{ steps.changelog_pr.outputs.head_sha }}
+          RUN_URL: ${{ steps.changelog_pr.outputs.run_url }}
+          VALIDATE_OUTCOME: ${{ steps.track_validate.outcome }}
+        run: |
+          state=success
+          description='Track validation passed for changelog PR'
+          if [[ "$VALIDATE_OUTCOME" != 'success' ]]; then
+            state=failure
+            description='Track validation failed for changelog PR'
+          fi
+
+          gh api \
+            repos/${{ github.repository }}/statuses/$HEAD_SHA \
+            -f state="$state" \
+            -f context='Track Validate' \
+            -f description="$description" \
+            -f target_url="$RUN_URL" >/dev/null
+
+      - name: Mark Track PR Lint pending
+        if: steps.changelog_pr.outputs.should_report == 'true'
+        env:
+          HEAD_SHA: ${{ steps.changelog_pr.outputs.head_sha }}
+          RUN_URL: ${{ steps.changelog_pr.outputs.run_url }}
+        run: |
+          gh api \
+            repos/${{ github.repository }}/statuses/$HEAD_SHA \
+            -f state=pending \
+            -f context='Track PR Lint' \
+            -f description='Running Track PR lint for changelog PR' \
+            -f target_url="$RUN_URL" >/dev/null
+
+      - name: Run Track PR Lint
+        if: steps.changelog_pr.outputs.should_report == 'true'
+        id: track_pr_lint
+        continue-on-error: true
+        env:
+          GITHUB_HEAD_REF: ${{ steps.changelog_pr.outputs.branch }}
+          PR_TITLE: ${{ steps.changelog_pr.outputs.title }}
+          PR_BODY: ${{ steps.changelog_pr.outputs.body }}
+          PR_NUMBER: ${{ steps.changelog_pr.outputs.pr_number }}
+        run: bash .track/scripts/track-pr-lint.sh
+
+      - name: Mark Track PR Lint final
+        if: steps.changelog_pr.outputs.should_report == 'true' && always()
+        env:
+          HEAD_SHA: ${{ steps.changelog_pr.outputs.head_sha }}
+          RUN_URL: ${{ steps.changelog_pr.outputs.run_url }}
+          PR_LINT_OUTCOME: ${{ steps.track_pr_lint.outcome }}
+        run: |
+          state=success
+          description='Track PR lint passed for changelog PR'
+          if [[ "$PR_LINT_OUTCOME" != 'success' ]]; then
+            state=failure
+            description='Track PR lint failed for changelog PR'
+          fi
+
+          gh api \
+            repos/${{ github.repository }}/statuses/$HEAD_SHA \
+            -f state="$state" \
+            -f context='Track PR Lint' \
+            -f description="$description" \
+            -f target_url="$RUN_URL" >/dev/null
+
+      - name: Fail workflow if changelog checks failed
+        if: steps.changelog_pr.outputs.should_report == 'true' && (steps.track_validate.outcome != 'success' || steps.track_pr_lint.outcome != 'success')
+        run: exit 1
