@@ -3,6 +3,7 @@
 <!-- DECISION INDEX (agents: scan this first, load full entries as needed)
 | Date       | Domain       | Title                                                          | Status     |
 |------------|--------------|----------------------------------------------------------------|------------|
+| 2026-04-02 | Product      | D-037: Narrow remaining backlog to Layer 3 plugin launch       | Accepted   |
 | 2026-03-27 | Product      | D-036: Internal evaluation is not a product lane               | Accepted   |
 | 2026-03-23 | Product      | D-035: Instruction architecture before workflow machinery     | Accepted   |
 | 2026-03-22 | Distribution | D-034: Plugin conversion (dual-format)                         | Accepted   |
@@ -40,6 +41,51 @@
 | 2026-03-17 | Product      | D-016: Conductor as Phase 1 host environment                  | Accepted   |
 | 2026-03-16 | Research     | D-017: Experiments 2 and 3 deferred                           | Accepted   |
 -->
+
+---
+
+
+## 2026-04-02 — D-037: Narrow remaining backlog to Layer 3 plugin launch
+
+**Domain:** Product
+**Status:** Accepted
+
+**Context:** Project 6 narrows the first stable Archeia release to the Layer 3 write path plus a decision on whether `/archeia:ask` is mature enough to ship alongside it. The remaining open backlog was created before that scope cut and still mixes governance follow-through, Layer 2/Layer 1 expansion, query-plus-maintenance planning, and future validation architecture.
+
+Existing decisions already point toward a smaller launch surface: D-029 keeps V0 to two skills plus templates, D-032 makes maintenance quality more important than breadth, D-034 makes the Claude Code plugin the primary distribution path, D-035 prefers stronger instructions before extra machinery, and D-036 treats quality investigation as ordinary task work rather than a parallel lane.
+
+**Decision:** Treat Project 6 as the primary launch track and triage the remaining open tasks as follows.
+
+| Task | Recommendation | Rationale |
+|------|----------------|-----------|
+| 1.1 | Cancel | This is a broad governance follow-through umbrella. Current source-of-truth boundaries are already documented in `docs/ONTOLOGY.md`, `.track/PROTOCOL.md`, `.archeia/PROTOCOL.md`, and repo instructions. Any concrete gap found during launch work should become a targeted task instead of keeping this umbrella open. |
+| 1.2 | Defer | Remaining Archeia document-family ownership review may still be useful, but it does not block a Layer 3 plugin launch and no concrete ownership failure is identified today. |
+| 2.1 | Defer | Layer 2 and Layer 1 generation remain part of the longer-term bottom-up product shape, but Project 6 explicitly removes that work from the first stable launch scope. |
+| 2.2 | Keep | Stable Layer 3 output depends on deterministic, trustworthy templates. Measuring repeat-run variance and tightening unstable sections directly improves the shipped write path. |
+| 3.1 | Change | The task currently bundles `/archeia:ask` launch-readiness with broader maintenance-model planning. Split those concerns: keep read-path stability in release scope, defer richer maintenance planning and automation follow-ons. |
+| 5.1 | Defer | Validation extraction remains a future deterministic maintenance capability, but the first stable plugin release does not require a full validation-architecture plan before shipping. |
+
+Project-level recommendations:
+
+| Project | Recommendation | Rationale |
+|---------|----------------|-----------|
+| P1 — Governance Foundation | Change | The migration baseline is good enough for launch. Cancel broad umbrella follow-through and reopen governance work only when a specific ownership or source-of-truth gap appears. |
+| P2 — Knowledge Generation Pipeline | Change | Keep the Layer 3 template-determinism slice, but defer Layer 2/Layer 1 expansion until after the launch bar is defined and the write path is stable. |
+| P3 — Query And Maintenance | Change | Separate `/archeia:ask` release work from the broader maintenance-model roadmap so launch decisions can stay narrow and testable. |
+| P5 — Markdown Validation Architecture | Defer | Treat deterministic validation architecture as a post-launch follow-on, not as a release gate for the first stable plugin. |
+
+**Assumptions relied on:** A-008 (minimal surface area), A-009 (agents follow repo instructions), A-011 (templates plus instructions beat extra machinery for V0)
+**Constraints respected:** Product shape (Layer 3-first stable launch), Distribution (plugin-primary release), Design (minimum releasable scope)
+
+**Consequences:**
+- Project 6 becomes the only active path for deciding first-release scope.
+- Tasks 6.2 and 6.3 should identify concrete launch blockers; task 6.4 should turn those findings into a release checklist and new implementation tasks where needed.
+- Broad umbrella tasks should not block launch unless they are rewritten into a concrete, release-scoped deliverable.
+- If launch analysis uncovers a real governance or validation blocker, create a new targeted task rather than reviving broad planning work unchanged.
+
+**Alternatives considered:**
+- Keep all open projects equally active — rejected because it spreads attention across too many fronts for a first stable release.
+- Cancel every non-launch task immediately — rejected because several items remain strategically valid after launch, even if they should not gate it now.
 
 ---
 
