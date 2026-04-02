@@ -25,7 +25,8 @@ This is the Archeia repo. It ships architecture knowledge generation and query s
 ## Workflow
 
 - This repo has no app build step and no service runtime
-- GitHub Actions runs semantic-release on pushes to `main`
+- GitHub Actions runs semantic-release on pushes to `main` to publish tags and GitHub releases
+- The release workflow must not push release commits back to `main`; changelog updates land through a separate PR
 - CI checks Archeia distribution sync (`ci.yml`)
 - Most changes are documentation or skill markdown
 - Use conventional commits so release automation can infer versions
@@ -49,6 +50,8 @@ This is the Archeia repo. It ships architecture knowledge generation and query s
 - Edit canonical Archeia skills in `.claude/skills/` first, then run `bash scripts/sync-skills.sh`
 - Track backlog state lives in default-branch `.track/tasks/*.md`
 - Track in-flight state lives in open GitHub PRs whose branches match `task/{id}-{slug}`
+- Repo-local PR expectations live in `.track/specs/pr-instructions.md`
+- Automated changelog PRs are intentionally untracked and use non-`task/` branches
 - `TODO.md` is a derived convenience view; regenerate it with `bash .track/scripts/track-todo.sh`
 - Read `.archeia/VISION.md` and `.archeia/PRODUCT.md` for full product context
 

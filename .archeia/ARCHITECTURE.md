@@ -72,5 +72,6 @@ Templates are canonical in `.claude/skills/archeia/templates/` and synced to the
 
 ## Repo Tooling
 
-- semantic-release and GitHub Actions for versioning and releases
+- semantic-release and GitHub Actions for versioning, tags, and GitHub releases
+- Release automation does not push changelog commits to `main`; release notes are mirrored into `CHANGELOG.md` through a separate PR
 - No build step, no runtime dependencies — the product is markdown files
