@@ -18,3 +18,8 @@ __pycache__/
 
 # Generated
 TODO.md
+BOARD.md
+PROJECTS.md
+
+# Track events
+.track/events/
