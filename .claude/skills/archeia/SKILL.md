@@ -149,10 +149,43 @@ Generate Layer 3 docs in this order (respecting dependencies):
 
 1. Read `templates/ARCHITECTURE.md` frontmatter and body
 2. Generate `.archeia/ARCHITECTURE.md` from collected signals
-3. Read `templates/STANDARDS.md` frontmatter and body
-4. Generate `.archeia/STANDARDS.md` (may reference ARCHITECTURE for topology)
-5. Read `templates/GUIDE.md` frontmatter and body
-6. Generate `.archeia/GUIDE.md` (may reference ARCHITECTURE + STANDARDS)
+3. Read `templates/SYSTEM.json` example
+4. Generate `.archeia/SYSTEM.json` — follow the example structure exactly,
+   replacing example data with evidence from this repo. Rules:
+   - `system`: exactly one object, sourced from manifest + README
+   - `people`: infer from README audience, auth roles, route groups. Empty `[]` if none found
+   - `external_systems`: every external service confirmed by manifest deps or docker-compose
+   - `relationships`: connect every entity. Every `source`/`target` must resolve to an `id` above
+   - Every entity needs `evidence` array with at least one file path
+   - IDs are kebab-case, deterministic from entity names
+   - Descriptions are one sentence, no marketing language
+   - Do NOT list internal modules as external systems
+5. Read `templates/CONTAINERS.json` example
+6. Generate `.archeia/CONTAINERS.json` — follow the example structure. Rules:
+   - `system_boundary`: must match `system` from SYSTEM.json (same id, name, description)
+   - `containers`: runtime units (processes, databases, caches), NOT source directories.
+     `type` is one of: `webapp | api | database | cache | queue | filesystem | worker | cli`
+   - `external_systems`: carried forward from SYSTEM.json, must match exactly
+   - `relationships`: container-to-container and container-to-external
+   - `people_container_mappings`: include only if SYSTEM.json has people, omit key otherwise
+   - For monoliths: still decompose if distinct runtime concerns exist
+   - Infer from: docker-compose services, workspace packages, Dockerfiles, entry points
+7. Read `templates/COMPONENTS.json` example
+8. Generate `.archeia/COMPONENTS.json` — follow the example structure. Rules:
+   - `containers`: one entry per container from CONTAINERS.json with internal source code.
+     Skip containers with no app-side code (e.g., managed databases without schema code)
+   - `components`: code-level modules (directories/packages, not files).
+     `type` is one of: `module | service | controller | repository | middleware | handler | library | config`
+     Prefix IDs with container ID (e.g., `api-routes`, `worker-jobs`)
+   - `external_systems`: include only if components talk directly to externals
+   - `relationships`: focus on architecturally significant connections (layer crossings,
+     module boundaries, external integrations). Do NOT enumerate every import
+   - Infer from: directory structure, import statements, module index files
+   - Map ARCHITECTURE.md Module Boundaries to components within containers
+9. Read `templates/STANDARDS.md` frontmatter and body
+10. Generate `.archeia/STANDARDS.md` (may reference ARCHITECTURE for topology)
+11. Read `templates/GUIDE.md` frontmatter and body
+12. Generate `.archeia/GUIDE.md` (may reference ARCHITECTURE + STANDARDS)
 
 For each generated file:
 - Follow the template's Required Sections exactly
@@ -218,6 +251,9 @@ If this is a Layer 3 refresh: skip this phase, preserve existing Layer 2 docs.
 
 Layer 3 (auto-generated, no human input):
 - `.archeia/ARCHITECTURE.md`
+- `.archeia/SYSTEM.json`
+- `.archeia/CONTAINERS.json`
+- `.archeia/COMPONENTS.json`
 - `.archeia/STANDARDS.md`
 - `.archeia/GUIDE.md`
 
